@@ -3,10 +3,15 @@ package cop5556sp17;
 import java.util.ArrayList;
 
 public class Scanner {
+	
+
+	final ArrayList<Token> tokens;
+	final String chars;
+	int tokenNum;
+	
 	/**
 	 * Kind enum
 	 */
-	
 	public static enum Kind {
 		IDENT(""), INT_LIT(""), KW_INTEGER("integer"), KW_BOOLEAN("boolean"), 
 		KW_IMAGE("image"), KW_URL("url"), KW_FILE("file"), KW_FRAME("frame"), 
@@ -31,9 +36,157 @@ public class Scanner {
 			return text;
 		}
 	}
-/**
- * Thrown by Scanner when an illegal character is encountered
- */
+	
+	public static enum State{
+		START("start"), IN_DIGIT("in_digit");
+		
+		State(String stateText){
+			this.stateText = stateText;
+		}
+		
+		final String stateText;
+		
+		public String getStateText(){
+			return stateText;
+		}
+	}
+	
+	
+	/**
+	 * Constructor, takes in a String and scans it
+	 * 
+	 * @param chars
+	 */
+	public Scanner(String chars) {
+		this.chars = chars;
+		tokens = new ArrayList<Token>();
+	}
+		
+	/**
+	 * Initializes Scanner object by traversing chars and adding tokens to tokens list.
+	 * 
+	 * @return this scanner
+	 * @throws IllegalCharException
+	 * @throws IllegalNumberException
+	 */
+	public Scanner scan() throws IllegalCharException, IllegalNumberException { 
+		int length = chars.length(); //TODO do i need to see if chars is null?
+		ScannerSwitchHelper switchHelper = new ScannerSwitchHelper(0, State.START);
+		
+		while(switchHelper.getCurrentPos() <= length){
+			switch(switchHelper.getCurrentState()){
+			case START:{
+				caseStart(switchHelper, length);
+				break;
+				}
+			case IN_DIGIT:{
+				caseInDigit(switchHelper);
+				break;
+				}
+			}
+		}	
+		return this;  
+	}
+	
+	/**
+	 * The starting case for the scanner
+	 * 
+	 * @param currentPos
+	 */
+	private void caseStart(ScannerSwitchHelper switchHelper, int length){
+		switchHelper.setCurrentPos(skipWhiteSpace(switchHelper.getCurrentPos()));
+		int currentChar = getCurrentChar(switchHelper.getCurrentPos(), length);
+		
+		if(currentChar == -1){//are we at the end of the line
+			addNewToken(Kind.EOF, switchHelper.getCurrentPos(), 1, State.START, switchHelper, true);
+		}
+		else if (Character.isDigit(currentChar)) //char is a digit
+			switchHelper.setCurrentState(State.IN_DIGIT);
+		else{
+			//TODO 
+		}
+	}
+	
+	/** 
+	 * Case for when in a digit
+	 * 
+	 * @param switchHelper
+	 */
+	private void caseInDigit(ScannerSwitchHelper switchHelper) throws IllegalNumberException{
+		
+		int currentChar = chars.charAt(switchHelper.getCurrentPos());
+		switchHelper.setStartPos(switchHelper.getCurrentPos());
+		
+		if(currentChar == '0'){ //if 0, create new token and got to Start
+			addNewToken(Kind.INT_LIT, switchHelper.getCurrentPos(), 1, State.START, switchHelper, true);
+		}else{
+			
+			while(switchHelper.getCurrentPos() < chars.length() && Character.isDigit(chars.charAt(switchHelper.getCurrentPos()))){
+				switchHelper.incrememntCurrentPos();
+			}
+			
+			String digit = chars.substring(switchHelper.getStartPos(), switchHelper.getCurrentPos()); //save in string for error checking
+			
+			try{
+				Integer.parseInt(digit); //parse to verify it is an int
+				addNewToken(Kind.INT_LIT, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+						State.START, switchHelper, false);
+			}catch(NumberFormatException e){
+				throw new IllegalNumberException("Digit is to large for int. Digit = " + digit);
+			}
+			
+		}
+	}
+	
+	/**
+	 * Returns the char (as an int) at the current position, or -1 (for EOF)
+	 * 
+	 * @param currentPos
+	 * @param length
+	 * @return
+	 */
+	private int getCurrentChar(int currentPos, int length){
+		return currentPos < length ?chars.charAt(currentPos) : -1;
+	}
+	
+	/** skips white space at the start of a token
+	 * @param currentPos
+	 * @return
+	 */
+	private int skipWhiteSpace(int currentPos){
+		while(currentPos < chars.length() && Character.isWhitespace(chars.charAt(currentPos)))
+			currentPos++;
+		return currentPos;
+	}
+	
+	/**
+	 * Adds a token to the token list, incremements the current position in the string, and goes to the specified state
+	 * 
+	 * @param kind
+	 * @param start
+	 * @param length
+	 * @param nextState
+	 * @param switchHelper
+	 */
+	private void addNewToken(Kind kind, int start, int length, State nextState, ScannerSwitchHelper switchHelper, 
+			boolean increment){
+		tokens.add(new Token(kind, start, length));
+		if(increment)
+			switchHelper.incrememntCurrentPos();
+		switchHelper.setCurrentState(nextState);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Thrown by Scanner when an illegal character is encountered
+	 */
 	@SuppressWarnings("serial")
 	public static class IllegalCharException extends Exception {
 		public IllegalCharException(String message) {
@@ -51,7 +204,6 @@ public class Scanner {
 		}
 	}
 	
-
 	/**
 	 * Holds the line and position in the line of a token.
 	 */
@@ -71,9 +223,6 @@ public class Scanner {
 		}
 	}
 		
-
-	
-
 	public class Token {
 		public final Kind kind;
 		public final int pos;  //position in input array
@@ -111,39 +260,7 @@ public class Scanner {
 		}
 		
 	}
-
-	 
-
-
-	Scanner(String chars) {
-		this.chars = chars;
-		tokens = new ArrayList<Token>();
-
-
-	}
-
-
 	
-	/**
-	 * Initializes Scanner object by traversing chars and adding tokens to tokens list.
-	 * 
-	 * @return this scanner
-	 * @throws IllegalCharException
-	 * @throws IllegalNumberException
-	 */
-	public Scanner scan() throws IllegalCharException, IllegalNumberException {
-		int pos = 0; 
-		//TODO IMPLEMENT THIS!!!!
-		tokens.add(new Token(Kind.EOF,pos,0));
-		return this;  
-	}
-
-
-
-	final ArrayList<Token> tokens;
-	final String chars;
-	int tokenNum;
-
 	/*
 	 * Return the next token in the token list and update the state so that
 	 * the next call will return the Token..  
@@ -164,8 +281,6 @@ public class Scanner {
 		return tokens.get(tokenNum+1);		
 	}
 
-	
-
 	/**
 	 * Returns a LinePos object containing the line and position in line of the 
 	 * given token.  
@@ -179,6 +294,55 @@ public class Scanner {
 		//TODO IMPLEMENT THIS
 		return null;
 	}
+	
+	/**
+	 * Created this class to help modularize scan() better (needed to return 2 values)
+	 * 
+	 * @author tony
+	 *
+	 */
+	public class ScannerSwitchHelper{
+		
+		private int currentPos;
+		private State currentState;
+		private int startPos;
+		
+		public ScannerSwitchHelper(){
+			
+		}
+		
+		public void incrememntCurrentPos(){
+			currentPos++;
+		}
+		
+		public ScannerSwitchHelper(int currentPos, State currentState){
+			this.currentPos = currentPos;
+			this.currentState = currentState;
+		}
+		
+		public int getCurrentPos() {
+			return currentPos;
+		}
 
+		public void setCurrentPos(int currentPos) {
+			this.currentPos = currentPos;
+		}
+
+		public State getCurrentState() {
+			return currentState;
+		}
+
+		public void setCurrentState(State currentState) {
+			this.currentState = currentState;
+		}
+
+		public int getStartPos() {
+			return startPos;
+		}
+
+		public void setStartPos(int startPos) {
+			this.startPos = startPos;
+		}
+	}
 
 }
