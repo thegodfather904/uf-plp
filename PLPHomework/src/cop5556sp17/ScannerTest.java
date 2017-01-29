@@ -16,22 +16,29 @@ public class ScannerTest {
     public ExpectedException thrown = ExpectedException.none();
 	
 	/*My Custom Tests*/
-	@Test
-	public void testDigit()throws IllegalCharException, IllegalNumberException{
-		String input = "9999999999999999";
+	
+	@Test 
+	public void testIdentStart() throws IllegalCharException, IllegalNumberException{
+		String input = "0abc 123";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
-		
-		Scanner.Token token = scanner.nextToken();
-		assertEquals(INT_LIT, token.kind);
-		assertEquals(0, token.pos);
-		token = scanner.nextToken();
-		assertEquals(EOF, token.kind);
-		assertEquals(6, token.pos);
-		
 	}
 	
+//	@Test
+//	public void testDigit()throws IllegalCharException, IllegalNumberException{
+//		String input = " 1 3 ";
+//		Scanner scanner = new Scanner(input);
+//		scanner.scan();
+//		
+//		Scanner.Token token = scanner.nextToken();
+//		assertEquals(INT_LIT, token.kind);
+//		assertEquals(0, token.pos);
+//		token = scanner.nextToken();
+//		assertEquals(EOF, token.kind);
+//		assertEquals(6, token.pos);
+//	}
 	
+
 	
 	
 //	@Test

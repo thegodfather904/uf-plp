@@ -38,7 +38,7 @@ public class Scanner {
 	}
 	
 	public static enum State{
-		START("start"), IN_DIGIT("in_digit");
+		START("start"), IN_DIGIT("in_digit"), IN_IDENT("in_ident"), OPERATOR("operator");
 		
 		State(String stateText){
 			this.stateText = stateText;
@@ -83,6 +83,13 @@ public class Scanner {
 				caseInDigit(switchHelper);
 				break;
 				}
+			case IN_IDENT:{
+				caseInIdent(switchHelper);
+				break;
+				}
+			case OPERATOR:{
+				
+				}
 			}
 		}	
 		return this;  
@@ -98,12 +105,14 @@ public class Scanner {
 		int currentChar = getCurrentChar(switchHelper.getCurrentPos(), length);
 		
 		if(currentChar == -1){//are we at the end of the line
-			addNewToken(Kind.EOF, switchHelper.getCurrentPos(), 1, State.START, switchHelper, true);
+			addNewToken(Kind.EOF, switchHelper.getCurrentPos(), 0, State.START, switchHelper, true);
 		}
 		else if (Character.isDigit(currentChar)) //char is a digit
 			switchHelper.setCurrentState(State.IN_DIGIT);
-		else{
-			//TODO 
+		else if(Character.isJavaIdentifierStart(currentChar)){
+			 switchHelper.setCurrentState(State.IN_IDENT);
+		}else{
+			//TODO
 		}
 	}
 	
@@ -136,6 +145,62 @@ public class Scanner {
 			}
 			
 		}
+	}
+	
+	/**
+	 * Case for idents (checks for keywords also
+	 * 
+	 * @param switchHelper
+	 */
+	private void caseInIdent(ScannerSwitchHelper switchHelper){
+		switchHelper.setStartPos(switchHelper.getCurrentPos());
+		
+		while(notAtEndOfString(switchHelper.getCurrentPos()) && 
+				Character.isJavaIdentifierPart(chars.charAt(switchHelper.getCurrentPos()))){
+			switchHelper.incrememntCurrentPos();
+		}
+		
+		addNewToken(Kind.IDENT, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+						State.START, switchHelper, false);
+		
+		//TODO check to make sure its no a reserved word
+	}
+	
+	/**
+	 * Returns true if a separator, false if not
+	 * 
+	 * @param currentChar
+	 * @return
+	 */
+	private boolean isCharSeparator(int currentChar){
+		
+		boolean isSeparator;
+		
+		switch(currentChar){
+			case ';': 
+				isSeparator = true; 
+				break;
+			case ',':
+				isSeparator = true; 
+				break;
+			case '(':
+				isSeparator = true; 
+				break;
+			case ')':
+				isSeparator = true; 
+				break;
+			case '{':
+				isSeparator = true; 
+				break;
+			case '}':
+				isSeparator = true; 
+				break;
+			default:
+				isSeparator = false;
+				break;
+		}
+		
+		return isSeparator;
 	}
 	
 	/**
@@ -176,6 +241,9 @@ public class Scanner {
 		switchHelper.setCurrentState(nextState);
 	}
 	
+	private boolean notAtEndOfString(int currentPos){
+		return currentPos < chars.length();
+	}
 	
 	
 	
@@ -257,6 +325,10 @@ public class Scanner {
 		public int intVal() throws NumberFormatException{
 			//TODO IMPLEMENT THIS
 			return 0;
+		}
+		
+		public String toString(){
+			return "kind: " + kind.getText() + " pos: " + pos + " length:" + length;
 		}
 		
 	}
