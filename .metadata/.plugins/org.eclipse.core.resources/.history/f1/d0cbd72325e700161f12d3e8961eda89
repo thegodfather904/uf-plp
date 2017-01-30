@@ -130,8 +130,9 @@ public class Scanner {
 			switchHelper.setCurrentState(State.SEPARATOR);
 		else if(isCharOperator(currentChar))
 			switchHelper.setCurrentState(State.OPERATOR);
-		else
-			switchHelper.setCurrentState(State.INVALID);
+		else{
+			//TODO
+		}
 	}
 	
 	

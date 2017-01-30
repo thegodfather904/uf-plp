@@ -39,7 +39,7 @@ public class Scanner {
 	
 	public static enum State{
 		START("start"), IN_DIGIT("in_digit"), IN_IDENT("in_ident"), OPERATOR("operator"), SEPARATOR("separator"),
-		COMMENT_START("comment_start"), INVALID("INVALID");
+		COMMENT_START("comment_start");
 		
 		State(String stateText){
 			this.stateText = stateText;
@@ -100,10 +100,6 @@ public class Scanner {
 				caseCommentStart(switchHelper);
 				break;
 				}
-			case INVALID:{
-				caseInvalidChar(switchHelper);
-				break;
-				}
 			}
 		}	
 		return this;  
@@ -130,8 +126,9 @@ public class Scanner {
 			switchHelper.setCurrentState(State.SEPARATOR);
 		else if(isCharOperator(currentChar))
 			switchHelper.setCurrentState(State.OPERATOR);
-		else
-			switchHelper.setCurrentState(State.INVALID);
+		else{
+			//TODO
+		}
 	}
 	
 	
@@ -265,17 +262,6 @@ public class Scanner {
 		addNewToken(operatorType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(),
 				State.START, switchHelper, false);
 		
-	}
-	
-	/**
-	 * Invalid char case (throws exception)
-	 * 
-	 * @param switchHelper
-	 * @throws IllegalCharException
-	 */
-	private void caseInvalidChar(ScannerSwitchHelper switchHelper) throws IllegalCharException{
-		char illegalChar = chars.charAt(switchHelper.getCurrentPos());
-		throw new IllegalCharException("Illegal Character found while scanning. Char = " + illegalChar);
 	}
 	
 	/**
