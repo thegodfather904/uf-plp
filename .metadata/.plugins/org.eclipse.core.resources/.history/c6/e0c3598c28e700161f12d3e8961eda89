@@ -19,18 +19,9 @@ public class ScannerTest {
 	
 	@Test 
 	public void testSeparator() throws IllegalCharException, IllegalNumberException{
-		String input = "0 100 4333";
+		String input = "~";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
-		int test;
-		Scanner.Token token = scanner.nextToken();
-		test = token.intVal();
-		
-		token = scanner.nextToken();
-		test = token.intVal();
-		
-		token = scanner.nextToken();
-		test = token.intVal();
 	}
 	
 	

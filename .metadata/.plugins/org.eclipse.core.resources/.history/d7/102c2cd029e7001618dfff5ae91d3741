@@ -845,10 +845,7 @@ public class Scanner {
 			String text;
 			
 			try{
-				if(length > 0)
-					text = chars.substring(pos, pos + length);
-				else
-					throw new Exception();
+				text = chars.substring(pos, pos + length);
 			}catch(Exception e){
 				text = kind.getText();
 			}
@@ -876,7 +873,8 @@ public class Scanner {
 		 * @throws NumberFormatException
 		 */
 		public int intVal() throws NumberFormatException{
-			return Integer.parseInt(getText());
+			//TODO IMPLEMENT THIS
+			return 0;
 		}
 		
 		public String toString(){

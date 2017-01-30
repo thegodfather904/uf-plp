@@ -796,6 +796,22 @@ public class Scanner {
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * Thrown by Scanner when an illegal character is encountered
 	 */
@@ -842,17 +858,8 @@ public class Scanner {
 
 		//returns the text of this Token
 		public String getText() {
-			String text;
-			
-			try{
-				if(length > 0)
-					text = chars.substring(pos, pos + length);
-				else
-					throw new Exception();
-			}catch(Exception e){
-				text = kind.getText();
-			}
-			return text;
+			//TODO IMPLEMENT THIS
+			return null;
 		}
 		
 		//returns a LinePos object representing the line and column of this Token
@@ -876,7 +883,8 @@ public class Scanner {
 		 * @throws NumberFormatException
 		 */
 		public int intVal() throws NumberFormatException{
-			return Integer.parseInt(getText());
+			//TODO IMPLEMENT THIS
+			return 0;
 		}
 		
 		public String toString(){

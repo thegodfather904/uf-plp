@@ -876,7 +876,10 @@ public class Scanner {
 		 * @throws NumberFormatException
 		 */
 		public int intVal() throws NumberFormatException{
-			return Integer.parseInt(getText());
+			if(kind.INT_LIT == Kind.INT_LIT)
+				return Integer.parseInt(getText());
+			else
+				throw new NumberFormatException();
 		}
 		
 		public String toString(){
