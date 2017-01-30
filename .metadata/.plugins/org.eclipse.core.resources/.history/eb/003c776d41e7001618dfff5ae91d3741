@@ -28,15 +28,6 @@ public class ScannerTest {
 		
 		t = scanner.nextToken();
 		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
 	}
 	
 	

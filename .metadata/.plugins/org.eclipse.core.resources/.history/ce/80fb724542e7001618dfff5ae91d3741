@@ -75,7 +75,7 @@ public class Scanner {
 	 * @throws IllegalNumberException
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException { 
-		int length = chars.length();
+		int length = chars.length(); //TODO do i need to see if chars is null?
 		ScannerSwitchHelper switchHelper = new ScannerSwitchHelper(0, State.START);
 		
 		while(switchHelper.getCurrentPos() <= length){
@@ -904,12 +904,6 @@ public class Scanner {
 		
 	}
 	
-	/**
-	 * Custom search for finding line number (couldn't use built in binary search)
-	 * 
-	 * @param pos
-	 * @return
-	 */
 	private int largestIndexFromPos(int pos) {
         if (posStarts.size() < 1) {
             return -1;
@@ -920,18 +914,23 @@ public class Scanner {
     private int largestIndexFromPos(int pos, int lb, int ub) {
         final int mid = (lb + ub) / 2;
 
+        // Need to go lower but can't
         if (mid == lb && posStarts.get(mid) > pos) {
             return -1;
         }
-        
+
+        // Found a candidate, and can't go higher
         if (posStarts.get(mid) <= pos && (mid == ub || posStarts.get(mid + 1) > pos)) {
             return mid;
         }
 
-        if (posStarts.get(mid) <= pos)
+        if (posStarts.get(mid) <= pos) {
+            // Consider upper half
             return largestIndexFromPos(pos, mid + 1, ub);
-        else
+        } else {
+            // Consider lower half
             return largestIndexFromPos(pos, lb, mid);
+        }
     }
 	
 	/*
@@ -964,7 +963,8 @@ public class Scanner {
 	 * @return
 	 */
 	public LinePos getLinePos(Token t) {
-		return t.getLinePos();
+		//TODO IMPLEMENT THIS
+		return null;
 	}
 	
 	/**

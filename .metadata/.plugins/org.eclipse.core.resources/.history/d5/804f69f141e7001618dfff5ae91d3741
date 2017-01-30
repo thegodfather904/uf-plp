@@ -75,7 +75,7 @@ public class Scanner {
 	 * @throws IllegalNumberException
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException { 
-		int length = chars.length();
+		int length = chars.length(); //TODO do i need to see if chars is null?
 		ScannerSwitchHelper switchHelper = new ScannerSwitchHelper(0, State.START);
 		
 		while(switchHelper.getCurrentPos() <= length){
@@ -875,7 +875,7 @@ public class Scanner {
 		
 		//returns a LinePos object representing the line and column of this Token
 		LinePos getLinePos(){	
-			int line = largestIndexFromPos(pos);
+			int line = greatestIndexNotExceeding(pos);
 			int column = pos - posStarts.get(line);
 			return new LinePos(line, column);
 		}
@@ -904,34 +904,33 @@ public class Scanner {
 		
 	}
 	
-	/**
-	 * Custom search for finding line number (couldn't use built in binary search)
-	 * 
-	 * @param pos
-	 * @return
-	 */
-	private int largestIndexFromPos(int pos) {
+	private int greatestIndexNotExceeding(int limit) {
         if (posStarts.size() < 1) {
             return -1;
         }
-        return largestIndexFromPos(pos, 0, posStarts.size() - 1);
+        return greatestIndexNotExceeding(limit, 0, posStarts.size() - 1);
     }
 
-    private int largestIndexFromPos(int pos, int lb, int ub) {
+    private int greatestIndexNotExceeding(int limit, int lb, int ub) {
         final int mid = (lb + ub) / 2;
 
-        if (mid == lb && posStarts.get(mid) > pos) {
+        // Need to go lower but can't
+        if (mid == lb && posStarts.get(mid) > limit) {
             return -1;
         }
-        
-        if (posStarts.get(mid) <= pos && (mid == ub || posStarts.get(mid + 1) > pos)) {
+
+        // Found a candidate, and can't go higher
+        if (posStarts.get(mid) <= limit && (mid == ub || posStarts.get(mid + 1) > limit)) {
             return mid;
         }
 
-        if (posStarts.get(mid) <= pos)
-            return largestIndexFromPos(pos, mid + 1, ub);
-        else
-            return largestIndexFromPos(pos, lb, mid);
+        if (posStarts.get(mid) <= limit) {
+            // Consider upper half
+            return greatestIndexNotExceeding(limit, mid + 1, ub);
+        } else {
+            // Consider lower half
+            return greatestIndexNotExceeding(limit, lb, mid);
+        }
     }
 	
 	/*
@@ -964,7 +963,8 @@ public class Scanner {
 	 * @return
 	 */
 	public LinePos getLinePos(Token t) {
-		return t.getLinePos();
+		//TODO IMPLEMENT THIS
+		return null;
 	}
 	
 	/**

@@ -1,7 +1,6 @@
 package cop5556sp17;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Scanner {
 	
@@ -9,7 +8,6 @@ public class Scanner {
 	final ArrayList<Token> tokens;
 	final String chars;
 	int tokenNum;
-	final ArrayList<Integer> posStarts;
 	
 	/**
 	 * Kind enum
@@ -63,8 +61,6 @@ public class Scanner {
 	public Scanner(String chars) {
 		this.chars = chars;
 		tokens = new ArrayList<Token>();
-		posStarts = new ArrayList<Integer>();
-		posStarts.add(new Integer(0));
 	}
 		
 	/**
@@ -75,7 +71,7 @@ public class Scanner {
 	 * @throws IllegalNumberException
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException { 
-		int length = chars.length();
+		int length = chars.length(); //TODO do i need to see if chars is null?
 		ScannerSwitchHelper switchHelper = new ScannerSwitchHelper(0, State.START);
 		
 		while(switchHelper.getCurrentPos() <= length){
@@ -538,23 +534,9 @@ public class Scanner {
 	 * @return
 	 */
 	private int skipWhiteSpace(int currentPos){
-		while(currentPos < chars.length() && Character.isWhitespace(chars.charAt(currentPos))){
-			if(isNewLine(currentPos)){
-				posStarts.add(new Integer(currentPos + 1));
-			}	
+		while(currentPos < chars.length() && Character.isWhitespace(chars.charAt(currentPos)))
 			currentPos++;
-		}
 		return currentPos;
-	}
-	
-	private boolean isNewLine(int currentPos){
-		boolean newLine = false;
-		char currentChar = chars.charAt(currentPos);
-		
-		if(currentChar == '\n')
-			newLine = true;
-		
-		return newLine;
 	}
 	
 	/**
@@ -874,10 +856,9 @@ public class Scanner {
 		}
 		
 		//returns a LinePos object representing the line and column of this Token
-		LinePos getLinePos(){	
-			int line = largestIndexFromPos(pos);
-			int column = pos - posStarts.get(line);
-			return new LinePos(line, column);
+		LinePos getLinePos(){
+			//TODO IMPLEMENT THIS
+			return null;
 		}
 
 		Token(Kind kind, int pos, int length) {
@@ -903,36 +884,6 @@ public class Scanner {
 		}
 		
 	}
-	
-	/**
-	 * Custom search for finding line number (couldn't use built in binary search)
-	 * 
-	 * @param pos
-	 * @return
-	 */
-	private int largestIndexFromPos(int pos) {
-        if (posStarts.size() < 1) {
-            return -1;
-        }
-        return largestIndexFromPos(pos, 0, posStarts.size() - 1);
-    }
-
-    private int largestIndexFromPos(int pos, int lb, int ub) {
-        final int mid = (lb + ub) / 2;
-
-        if (mid == lb && posStarts.get(mid) > pos) {
-            return -1;
-        }
-        
-        if (posStarts.get(mid) <= pos && (mid == ub || posStarts.get(mid + 1) > pos)) {
-            return mid;
-        }
-
-        if (posStarts.get(mid) <= pos)
-            return largestIndexFromPos(pos, mid + 1, ub);
-        else
-            return largestIndexFromPos(pos, lb, mid);
-    }
 	
 	/*
 	 * Return the next token in the token list and update the state so that
@@ -964,7 +915,8 @@ public class Scanner {
 	 * @return
 	 */
 	public LinePos getLinePos(Token t) {
-		return t.getLinePos();
+		//TODO IMPLEMENT THIS
+		return null;
 	}
 	
 	/**

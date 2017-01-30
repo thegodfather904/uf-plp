@@ -19,24 +19,9 @@ public class ScannerTest {
 	
 	@Test 
 	public void testSeparator() throws IllegalCharException, IllegalNumberException{
-		String input = "one two\nthree four\nfive";
+		String input = "onetwo\nthreefour\nfive";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
-		
-		Scanner.Token t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
-		
-		t = scanner.nextToken();
-		t.getLinePos();
 	}
 	
 	

@@ -75,7 +75,7 @@ public class Scanner {
 	 * @throws IllegalNumberException
 	 */
 	public Scanner scan() throws IllegalCharException, IllegalNumberException { 
-		int length = chars.length();
+		int length = chars.length(); //TODO do i need to see if chars is null?
 		ScannerSwitchHelper switchHelper = new ScannerSwitchHelper(0, State.START);
 		
 		while(switchHelper.getCurrentPos() <= length){
@@ -964,7 +964,8 @@ public class Scanner {
 	 * @return
 	 */
 	public LinePos getLinePos(Token t) {
-		return t.getLinePos();
+		//TODO IMPLEMENT THIS
+		return null;
 	}
 	
 	/**
