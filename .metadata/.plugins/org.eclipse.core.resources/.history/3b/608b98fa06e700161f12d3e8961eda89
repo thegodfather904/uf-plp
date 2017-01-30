@@ -97,8 +97,7 @@ public class Scanner {
 				break;
 				}
 			case COMMENT_START:{
-				caseCommentStart(switchHelper);
-				break;
+				
 				}
 			}
 		}	

@@ -97,8 +97,7 @@ public class Scanner {
 				break;
 				}
 			case COMMENT_START:{
-				caseCommentStart(switchHelper);
-				break;
+				
 				}
 			}
 		}	
@@ -151,11 +150,7 @@ public class Scanner {
 			while(!isCommentEnd(switchHelper))
 				switchHelper.incrememntCurrentPos();
 			
-			//increment past the comment end
-			switchHelper.incrememntCurrentPos();
-			switchHelper.incrememntCurrentPos();
 			
-			switchHelper.setCurrentState(State.START);
 		}
 	}
 	

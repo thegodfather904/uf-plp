@@ -97,8 +97,7 @@ public class Scanner {
 				break;
 				}
 			case COMMENT_START:{
-				caseCommentStart(switchHelper);
-				break;
+				
 				}
 			}
 		}	
@@ -147,16 +146,6 @@ public class Scanner {
 		//make sure next token set isn't "*/"
 		if(isCommentEnd(switchHelper))
 			throw new IllegalCharException("Comment Failure - comment was empty");
-		else{
-			while(!isCommentEnd(switchHelper))
-				switchHelper.incrememntCurrentPos();
-			
-			//increment past the comment end
-			switchHelper.incrememntCurrentPos();
-			switchHelper.incrememntCurrentPos();
-			
-			switchHelper.setCurrentState(State.START);
-		}
 	}
 	
 	/** 

@@ -97,8 +97,7 @@ public class Scanner {
 				break;
 				}
 			case COMMENT_START:{
-				caseCommentStart(switchHelper);
-				break;
+				
 				}
 			}
 		}	
@@ -131,32 +130,8 @@ public class Scanner {
 		}
 	}
 	
-	
-	/**
-	 * Case for a comment start
-	 * 
-	 * @param switchHelper
-	 * @throws IllegalCharException
-	 */
 	private void caseCommentStart(ScannerSwitchHelper switchHelper) throws IllegalCharException{
 		
-		//increment past "/*"
-		switchHelper.incrememntCurrentPos();
-		switchHelper.incrememntCurrentPos();
-		
-		//make sure next token set isn't "*/"
-		if(isCommentEnd(switchHelper))
-			throw new IllegalCharException("Comment Failure - comment was empty");
-		else{
-			while(!isCommentEnd(switchHelper))
-				switchHelper.incrememntCurrentPos();
-			
-			//increment past the comment end
-			switchHelper.incrememntCurrentPos();
-			switchHelper.incrememntCurrentPos();
-			
-			switchHelper.setCurrentState(State.START);
-		}
 	}
 	
 	/** 
@@ -272,22 +247,6 @@ public class Scanner {
 			commentStart = true;
 		
 		return commentStart;
-	}
-	
-	/**
-	 * Returns true if its the the end of a comment ("*slash")
-	 * 
-	 * @param switchHelper
-	 * @return
-	 */
-	private boolean isCommentEnd(ScannerSwitchHelper switchHelper){
-		boolean commentEnd = false;
-		int currentChar = chars.charAt(switchHelper.getCurrentPos());
-		
-		if(currentChar == '*' && getNextChar(switchHelper.getCurrentPos()) == '/')
-			commentEnd = true;
-		
-		return commentEnd;
 	}
 	
 	/**
