@@ -19,7 +19,7 @@ public class ScannerTest {
 	
 	@Test 
 	public void testSeparator() throws IllegalCharException, IllegalNumberException{
-		String input = "test /* test */";
+		String input = "//*TEST*//";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 	}

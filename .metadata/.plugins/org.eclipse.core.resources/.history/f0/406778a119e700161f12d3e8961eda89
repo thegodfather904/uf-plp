@@ -151,7 +151,6 @@ public class Scanner {
 			while(getCurrentChar(switchHelper.getCurrentPos(), chars.length()) != -1 && !isCommentEnd(switchHelper))
 				switchHelper.incrememntCurrentPos();
 			
-			//if there isnt a closing "*/", throw an error
 			if(getCurrentChar(switchHelper.getCurrentPos(), chars.length()) == -1)
 				throw new IllegalCharException("Comment Failure - missing closing comment");
 			else{

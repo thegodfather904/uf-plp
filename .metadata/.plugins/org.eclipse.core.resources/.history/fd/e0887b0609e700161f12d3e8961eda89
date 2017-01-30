@@ -148,20 +148,14 @@ public class Scanner {
 		if(isCommentEnd(switchHelper))
 			throw new IllegalCharException("Comment Failure - comment was empty");
 		else{
-			while(getCurrentChar(switchHelper.getCurrentPos(), chars.length()) != -1 && !isCommentEnd(switchHelper))
+			while(!isCommentEnd(switchHelper))
 				switchHelper.incrememntCurrentPos();
 			
-			//if there isnt a closing "*/", throw an error
-			if(getCurrentChar(switchHelper.getCurrentPos(), chars.length()) == -1)
-				throw new IllegalCharException("Comment Failure - missing closing comment");
-			else{
-				//increment past the comment end
-				switchHelper.incrememntCurrentPos();
-				switchHelper.incrememntCurrentPos();	
-				switchHelper.setCurrentState(State.START);	
-			}
+			//increment past the comment end
+			switchHelper.incrememntCurrentPos();
+			switchHelper.incrememntCurrentPos();
 			
-			
+			switchHelper.setCurrentState(State.START);
 		}
 	}
 	
