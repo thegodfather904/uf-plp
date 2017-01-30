@@ -38,7 +38,7 @@ public class Scanner {
 	}
 	
 	public static enum State{
-		START("start"), IN_DIGIT("in_digit"), IN_IDENT("in_ident"), OPERATOR("operator");
+		START("start"), IN_DIGIT("in_digit"), IN_IDENT("in_ident"), OPERATOR("operator"), SEPARATOR("separator");
 		
 		State(String stateText){
 			this.stateText = stateText;
@@ -87,8 +87,13 @@ public class Scanner {
 				caseInIdent(switchHelper);
 				break;
 				}
+			case SEPARATOR:{
+				caseSeparator(switchHelper);
+				break;
+				}
 			case OPERATOR:{
-				
+				caseOperator(switchHelper);
+				break;
 				}
 			}
 		}	
@@ -107,10 +112,14 @@ public class Scanner {
 		if(currentChar == -1){//are we at the end of the line
 			addNewToken(Kind.EOF, switchHelper.getCurrentPos(), 0, State.START, switchHelper, true);
 		}
-		else if (Character.isDigit(currentChar)) //char is a digit
+		else if(Character.isDigit(currentChar)) //char is a digit
 			switchHelper.setCurrentState(State.IN_DIGIT);
 		else if(Character.isJavaIdentifierStart(currentChar)){
 			 switchHelper.setCurrentState(State.IN_IDENT);
+		}else if(isCharSeparator(currentChar)){
+			switchHelper.setCurrentState(State.SEPARATOR);
+		}else if(isCharOperator(currentChar)){
+			switchHelper.setCurrentState(State.OPERATOR);
 		}else{
 			//TODO
 		}
@@ -160,10 +169,59 @@ public class Scanner {
 			switchHelper.incrememntCurrentPos();
 		}
 		
-		addNewToken(Kind.IDENT, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
-						State.START, switchHelper, false);
+		String currentToken = buildStringFromToken(switchHelper);
 		
-		//TODO check to make sure its no a reserved word
+		//check for various reserved words
+		if(isKeyword(currentToken)){
+			Kind keywordType = keywordType(currentToken);
+			addNewToken(keywordType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}else if(isFilterOpKeyword(currentToken)){
+			Kind keywordType = filterOpKeywordType(currentToken);
+			addNewToken(keywordType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}else if(isImageOpKeyword(currentToken)){
+			Kind keywordType = imageOpKeywordType(currentToken);
+			addNewToken(keywordType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}else if(isFrameOpKeyword(currentToken)){
+			Kind keywordType = frameOpKeywordType(currentToken);
+			addNewToken(keywordType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}else if(isBooleanLiteral(currentToken)){
+			Kind keywordType = booleanLiteralType(currentToken);
+			addNewToken(keywordType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}else{
+			addNewToken(Kind.IDENT, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(), 
+					State.START, switchHelper, false);
+		}
+	}
+	
+	/**
+	 * Separator case
+	 * 
+	 * @param switchHelper
+	 */
+	private void caseSeparator(ScannerSwitchHelper switchHelper){
+		int currentChar = chars.charAt(switchHelper.getCurrentPos());
+		Kind separatorType = separatorType(currentChar);
+		addNewToken(separatorType, switchHelper.getCurrentPos(), 1,
+				State.START, switchHelper, true);
+	}
+	
+	/**
+	 * Operator case
+	 * 
+	 * @param switchHelper
+	 */
+	private void caseOperator(ScannerSwitchHelper switchHelper) throws IllegalCharException{
+		int currentChar = chars.charAt(switchHelper.getCurrentPos());
+		switchHelper.setStartPos(switchHelper.getCurrentPos());
+		Kind operatorType = operatorType(currentChar, switchHelper);
+		addNewToken(operatorType, switchHelper.getStartPos(), switchHelper.getCurrentPos() - switchHelper.getStartPos(),
+				State.START, switchHelper, false);
+		
 	}
 	
 	/**
@@ -204,6 +262,165 @@ public class Scanner {
 	}
 	
 	/**
+	 * Returns the kind the separator is
+	 * 
+	 * @param currentChar
+	 * @return
+	 */
+	private Kind separatorType(int currentChar){
+		Kind type = null;
+		
+		switch(currentChar){
+		case ';': 
+			type = Kind.SEMI; 
+			break;
+		case ',':
+			type = Kind.COMMA; 
+			break;
+		case '(':
+			type = Kind.LPAREN; 
+			break;
+		case ')':
+			type = Kind.RPAREN; 
+			break;
+		case '{':
+			type = Kind.LBRACE; 
+			break;
+		case '}':
+			type = Kind.RBRACE; 
+			break;
+		}
+		
+		return type;
+	}
+	
+	/**
+	 * Returns true if the char is an operator
+	 * 
+	 * @param currentChar
+	 * @return
+	 */
+	private boolean isCharOperator(int currentChar){
+		
+		boolean isOperator;
+		
+		switch(currentChar){
+			case '|': 
+				isOperator = true; 
+				break;
+			case '&':
+				isOperator = true; 
+				break;
+			case '=':
+				isOperator = true; 
+				break;
+			case '!':
+				isOperator = true; 
+				break;
+			case '<':
+				isOperator = true; 
+				break;
+			case '>':
+				isOperator = true; 
+				break;
+			case '+':
+				isOperator = true; 
+				break;
+			case '-':
+				isOperator = true; 
+				break;
+			case '*':
+				isOperator = true; 
+				break;
+			case '/':
+				isOperator = true; 
+				break;
+			case '%':
+				isOperator = true; 
+				break;
+			default:
+				isOperator = false;
+				break;
+		}
+		
+		return isOperator;
+	}
+	
+	private Kind operatorType(int currentChar, ScannerSwitchHelper switchHelper) throws IllegalCharException{
+		Kind type = null;
+		
+		int currentPos = switchHelper.getCurrentPos();
+		
+		switch(currentChar){
+		case '|':
+			if(getNextChar(currentPos) == '-' && getNextChar(++currentPos) == '>'){
+				type = Kind.BARARROW;
+				switchHelper.incrememntCurrentPos();
+				switchHelper.incrememntCurrentPos();
+			}else
+				type = Kind.OR;
+			break;
+		case '&':
+			type = Kind.AND;
+			break;
+		case '=':
+			if(getNextChar(currentPos) == '='){
+				type = Kind.EQUAL;
+				switchHelper.incrememntCurrentPos();
+			}else
+				throw new IllegalCharException("Operator Failure - EQUAL(=) not followed by cooresponding EQUAL(=)");
+			break;
+		case '!':
+			if(getNextChar(currentPos) == '='){
+				type = Kind.NOTEQUAL;
+				switchHelper.incrememntCurrentPos();
+			}else
+				type = Kind.NOT;
+			break;
+		case '<':
+			if(getNextChar(currentPos) == '='){
+				type = Kind.LE;
+				switchHelper.incrememntCurrentPos();
+			}else if (getNextChar(currentPos) == '-'){
+				type = Kind.ASSIGN;
+				switchHelper.incrememntCurrentPos();
+			}else
+				type = Kind.LT;
+			break;
+		case '>':
+			if(getNextChar(currentPos) == '='){
+				type = Kind.GE;
+				switchHelper.incrememntCurrentPos();
+			}else
+				type = Kind.GT;
+			break;
+		case '+':
+			type = Kind.PLUS;
+			break;
+		case '-' :
+			if(getNextChar(currentPos) == '>'){
+				type = Kind.ARROW;
+				switchHelper.incrememntCurrentPos();
+			}else
+				type = Kind.MINUS;
+			break;
+		case '/' :
+			type = Kind.DIV;
+			break;
+		case '*' :
+			type = Kind.TIMES;
+			break;
+		case '%' :
+			type = Kind.MOD;
+			break;
+		}
+		
+		switchHelper.incrememntCurrentPos();
+		
+		return type;
+	}	
+	
+	/**
 	 * Returns the char (as an int) at the current position, or -1 (for EOF)
 	 * 
 	 * @param currentPos
@@ -212,6 +429,18 @@ public class Scanner {
 	 */
 	private int getCurrentChar(int currentPos, int length){
 		return currentPos < length ?chars.charAt(currentPos) : -1;
+	}
+	
+	/**
+	 * Returns the next char in the string (or -1 for EOF)
+	 * 
+	 * @param currentPos
+	 * @param length
+	 * @return
+	 */
+	private int getNextChar(int currentPos){
+		currentPos++;
+		return currentPos < chars.length() ?chars.charAt(currentPos) : -1;
 	}
 	
 	/** skips white space at the start of a token
@@ -241,9 +470,254 @@ public class Scanner {
 		switchHelper.setCurrentState(nextState);
 	}
 	
+	/**
+	 * Returns true if not at end of chars, false if at end
+	 * 
+	 * @param currentPos
+	 * @return
+	 */
 	private boolean notAtEndOfString(int currentPos){
 		return currentPos < chars.length();
 	}
+	
+	/**
+	 * Returns true if is a keyword, false if not
+	 * 
+	 * @param startPos
+	 * @param length
+	 * @return
+	 */
+	private boolean isKeyword(String currentToken){
+		boolean keyword = false;
+		
+		if(currentToken.equals(Kind.KW_INTEGER.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_BOOLEAN.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_IMAGE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_URL.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_FILE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_FRAME.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_WHILE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_IF.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.OP_SLEEP.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_SCREENHEIGHT.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_SCREENWIDTH.getText()))
+			keyword = true;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns the type of keyword the token is
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private Kind keywordType(String currentToken){
+		Kind keyword = null;
+		
+		if(currentToken.equals(Kind.KW_INTEGER.getText()))
+			keyword = Kind.KW_INTEGER;
+		else if(currentToken.equals(Kind.KW_BOOLEAN.getText()))
+			keyword = Kind.KW_BOOLEAN;
+		else if(currentToken.equals(Kind.KW_IMAGE.getText()))
+			keyword = Kind.KW_IMAGE;
+		else if(currentToken.equals(Kind.KW_URL.getText()))
+			keyword = Kind.KW_URL;
+		else if(currentToken.equals(Kind.KW_FILE.getText()))
+			keyword = Kind.KW_FILE;
+		else if(currentToken.equals(Kind.KW_FRAME.getText()))
+			keyword = Kind.KW_FRAME;
+		else if(currentToken.equals(Kind.KW_WHILE.getText()))
+			keyword = Kind.KW_WHILE;
+		else if(currentToken.equals(Kind.KW_IF.getText()))
+			keyword = Kind.KW_IF;
+		else if(currentToken.equals(Kind.OP_SLEEP.getText()))
+			keyword = Kind.OP_SLEEP;
+		else if(currentToken.equals(Kind.KW_SCREENHEIGHT.getText()))
+			keyword = Kind.KW_SCREENHEIGHT;
+		else if(currentToken.equals(Kind.KW_SCREENWIDTH.getText()))
+			keyword = Kind.KW_SCREENWIDTH;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns true if is a filter op keyword, false if not
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private boolean isFilterOpKeyword(String currentToken){
+		boolean keyword = false;
+		
+		if(currentToken.equals(Kind.OP_GRAY.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.OP_CONVOLVE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.OP_BLUR.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_SCALE.getText()))
+			keyword = true;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns the type of filter op keyword the token is
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private Kind filterOpKeywordType(String currentToken){
+		Kind keyword = null;
+		
+		if(currentToken.equals(Kind.OP_GRAY.getText()))
+			keyword = Kind.OP_GRAY;
+		else if(currentToken.equals(Kind.OP_CONVOLVE.getText()))
+			keyword = Kind.OP_CONVOLVE;
+		else if(currentToken.equals(Kind.OP_BLUR.getText()))
+			keyword = Kind.OP_BLUR;
+		else if(currentToken.equals(Kind.KW_SCALE.getText()))
+			keyword = Kind.KW_SCALE;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns true if is a image op keyword, false if not
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private boolean isImageOpKeyword(String currentToken){
+		boolean keyword = false;
+		
+		if(currentToken.equals(Kind.OP_WIDTH.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.OP_HEIGHT.getText()))
+			keyword = true;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns the type of image op keyword the token is
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private Kind imageOpKeywordType(String currentToken){
+		Kind keyword = null;
+		
+		if(currentToken.equals(Kind.OP_WIDTH.getText()))
+			keyword = Kind.OP_WIDTH;
+		else if(currentToken.equals(Kind.OP_HEIGHT.getText()))
+			keyword = Kind.OP_HEIGHT;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns true if is a frame op keyword, false if not
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private boolean isFrameOpKeyword(String currentToken){
+		boolean keyword = false;
+		
+		if(currentToken.equals(Kind.KW_XLOC.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_YLOC.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_HIDE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_SHOW.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_MOVE.getText()))
+			keyword = true;
+		
+		return keyword;
+	}
+	
+	/**
+	 * Returns the type of frame op keyword the token is
+	 * 
+	 * @param currentToken
+	 * @return
+	 */
+	private Kind frameOpKeywordType(String currentToken){
+		Kind keyword = null;
+		
+		if(currentToken.equals(Kind.KW_XLOC.getText()))
+			keyword = Kind.KW_XLOC;
+		else if(currentToken.equals(Kind.KW_YLOC.getText()))
+			keyword = Kind.KW_YLOC;
+		else if(currentToken.equals(Kind.KW_HIDE.getText()))
+			keyword = Kind.KW_HIDE;
+		else if(currentToken.equals(Kind.KW_SHOW.getText()))
+			keyword = Kind.KW_SHOW;
+		else if(currentToken.equals(Kind.KW_MOVE.getText()))
+			keyword = Kind.KW_MOVE;
+		
+		return keyword;
+	}
+	
+	private boolean isBooleanLiteral(String currentToken){
+		boolean keyword = false;
+		
+		if(currentToken.equals(Kind.KW_TRUE.getText()))
+			keyword = true;
+		else if(currentToken.equals(Kind.KW_FALSE.getText()))
+			keyword = true;
+		
+		return keyword;
+	}
+	
+	private Kind booleanLiteralType(String currentToken){
+		Kind keyword = null;
+		
+		if(currentToken.equals(Kind.KW_TRUE.getText()))
+			keyword = Kind.KW_TRUE;
+		else if(currentToken.equals(Kind.KW_FALSE.getText()))
+			keyword = Kind.KW_FALSE;
+		
+		return keyword;
+	}
+	
+	
+	
+	/**
+	 * Builds a String from a given token (used for keyword match, etc)
+	 * 
+	 * @param switchHelper
+	 * @return
+	 */
+	private String buildStringFromToken(ScannerSwitchHelper switchHelper){
+		int start = switchHelper.getStartPos();
+		int length = switchHelper.getCurrentPos() - switchHelper.getStartPos();
+		return chars.substring(start, start + length);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

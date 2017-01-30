@@ -2,4 +2,5 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="com.sun.corba.se.spi.orbutil.fsm.State"/>
 <fullyQualifiedTypeName name="cop5556sp17.Scanner.Token"/>
+<fullyQualifiedTypeName name="cop5556sp17.Scanner.Kind"/>
 </qualifiedTypeNameHistroy>
