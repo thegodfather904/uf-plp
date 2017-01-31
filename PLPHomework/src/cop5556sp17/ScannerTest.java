@@ -40,66 +40,66 @@ public class ScannerTest {
 	}
 	
 	
-//	@Test 
-//	public void testIdentStart() throws IllegalCharException, IllegalNumberException{
-//		String input = "true false";
-//		Scanner scanner = new Scanner(input);
-//		scanner.scan();
-//	}
+	@Test 
+	public void testIdentStart() throws IllegalCharException, IllegalNumberException{
+		String input = "true false";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+	}
 	
-//	@Test
-//	public void testDigit()throws IllegalCharException, IllegalNumberException{
-//		String input = " 1 3 ";
-//		Scanner scanner = new Scanner(input);
-//		scanner.scan();
-//		
-//		Scanner.Token token = scanner.nextToken();
-//		assertEquals(INT_LIT, token.kind);
-//		assertEquals(0, token.pos);
-//		token = scanner.nextToken();
-//		assertEquals(EOF, token.kind);
-//		assertEquals(6, token.pos);
-//	}
+	@Test
+	public void testDigit()throws IllegalCharException, IllegalNumberException{
+		String input = " 1 3 ";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		
+		Scanner.Token token = scanner.nextToken();
+		assertEquals(INT_LIT, token.kind);
+		assertEquals(0, token.pos);
+		token = scanner.nextToken();
+		assertEquals(EOF, token.kind);
+		assertEquals(6, token.pos);
+	}
 	
 
 	
 	
-//	@Test
-//	public void testEmpty() throws IllegalCharException, IllegalNumberException {
-//		String input = "";
-//		Scanner scanner = new Scanner(input);
-//		scanner.scan();
-//	}
-//
-//	@Test
-//	public void testSemiConcat() throws IllegalCharException, IllegalNumberException {
-//		//input string
-//		String input = ";;;";
-//		//create and initialize the scanner
-//		Scanner scanner = new Scanner(input);
-//		scanner.scan();
-//		//get the first token and check its kind, position, and contents
-//		Scanner.Token token = scanner.nextToken();
-//		assertEquals(SEMI, token.kind);
-//		assertEquals(0, token.pos);
-//		String text = SEMI.getText();
-//		assertEquals(text.length(), token.length);
-//		assertEquals(text, token.getText());
-//		//get the next token and check its kind, position, and contents
-//		Scanner.Token token1 = scanner.nextToken();
-//		assertEquals(SEMI, token1.kind);
-//		assertEquals(1, token1.pos);
-//		assertEquals(text.length(), token1.length);
-//		assertEquals(text, token1.getText());
-//		Scanner.Token token2 = scanner.nextToken();
-//		assertEquals(SEMI, token2.kind);
-//		assertEquals(2, token2.pos);
-//		assertEquals(text.length(), token2.length);
-//		assertEquals(text, token2.getText());
-//		//check that the scanner has inserted an EOF token at the end
-//		Scanner.Token token3 = scanner.nextToken();
-//		assertEquals(Scanner.Kind.EOF,token3.kind);
-//	}
+	@Test
+	public void testEmpty() throws IllegalCharException, IllegalNumberException {
+		String input = "";
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+	}
+
+	@Test
+	public void testSemiConcat() throws IllegalCharException, IllegalNumberException {
+		//input string
+		String input = ";;;";
+		//create and initialize the scanner
+		Scanner scanner = new Scanner(input);
+		scanner.scan();
+		//get the first token and check its kind, position, and contents
+		Scanner.Token token = scanner.nextToken();
+		assertEquals(SEMI, token.kind);
+		assertEquals(0, token.pos);
+		String text = SEMI.getText();
+		assertEquals(text.length(), token.length);
+		assertEquals(text, token.getText());
+		//get the next token and check its kind, position, and contents
+		Scanner.Token token1 = scanner.nextToken();
+		assertEquals(SEMI, token1.kind);
+		assertEquals(1, token1.pos);
+		assertEquals(text.length(), token1.length);
+		assertEquals(text, token1.getText());
+		Scanner.Token token2 = scanner.nextToken();
+		assertEquals(SEMI, token2.kind);
+		assertEquals(2, token2.pos);
+		assertEquals(text.length(), token2.length);
+		assertEquals(text, token2.getText());
+		//check that the scanner has inserted an EOF token at the end
+		Scanner.Token token3 = scanner.nextToken();
+		assertEquals(Scanner.Kind.EOF,token3.kind);
+	}
 	
 	
 	/**
@@ -110,13 +110,13 @@ public class ScannerTest {
 	 * @throws IllegalCharException
 	 * @throws IllegalNumberException
 	 */
-//	@Test
-//	public void testIntOverflowError() throws IllegalCharException, IllegalNumberException{
-//		String input = "99999999999999999";
-//		Scanner scanner = new Scanner(input);
-//		thrown.expect(IllegalNumberException.class);
-//		scanner.scan();		
-//	}
+	@Test
+	public void testIntOverflowError() throws IllegalCharException, IllegalNumberException{
+		String input = "99999999999999999";
+		Scanner scanner = new Scanner(input);
+		thrown.expect(IllegalNumberException.class);
+		scanner.scan();		
+	}
 
 //TODO  more tests
 	
