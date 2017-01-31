@@ -19,7 +19,7 @@ public class ScannerTest {
 	
 	@Test 
 	public void testSeparator() throws IllegalCharException, IllegalNumberException{
-		String input = "while(x < 0){\n x == new integer\n}\n /*This is a test!!!*/";
+		String input = "while(x < 0){\n x = new integer\n}\n /*This is a test!!!*/";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		
