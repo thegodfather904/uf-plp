@@ -16,7 +16,7 @@ public class ParserTest {
 	
 	@Test
 	public void filterOpTest() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "frame test";
+		String input = "one * two + three / four >= five * 45";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);

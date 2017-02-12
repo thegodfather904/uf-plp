@@ -54,24 +54,8 @@ public class Parser {
 	void program() throws SyntaxException {
 		
 		while(scanner.peek() != null){
-			if(predictFilterOp())
-				filterOp();
-			else if(predictFrameOp())
-				frameOp();
-			else if(predictImageOp())
-				imageOp();
-			else if(predictArrowOp())
-				arrowOp();
-			else if(predictRelOp())
-				relOp();
-			else if(predictWeakOp())
-				weakOp();
-			else if(predictStrongOp())
-				strongOp();
-			else if(predictParamDec())
-				paramDec();
-			else if(predictDec())
-				dec();
+			if(predictExpression())
+				expression();
 		}
 		
 //		throw new UnimplementedFeatureException();
@@ -79,18 +63,27 @@ public class Parser {
 	
 	
 	void expression() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		term();
+		while(predictRelOp()){
+			relOp();
+			term();
+		}
 	}
 
 	void term() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		elem();
+		while(predictWeakOp()){
+			weakOp();
+			elem();
+		}
 	}
 
 	void elem() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		factor();
+		while(predictStrongOp()){
+			strongOp();
+			factor();
+		}
 	}
 
 	void factor() throws SyntaxException {
@@ -121,8 +114,7 @@ public class Parser {
 		}
 			break;
 		default:
-			//you will want to provide a more useful error message
-			throw new SyntaxException("illegal factor");
+			throw new SyntaxException("Expected factor but recieved token: " + t.toString());
 		}
 	}
 
@@ -494,6 +486,60 @@ public class Parser {
 		}
 		return isDec;
 	}
+	
+	private boolean predictFactor(){
+		boolean isFactor;
+		Kind kind = t.kind;
+		switch (kind) {
+		case IDENT:
+			isFactor = true;
+			break;
+		case INT_LIT:
+			isFactor = true;
+			break;
+		case KW_TRUE:
+			isFactor = true;
+			break;
+		case KW_FALSE:
+			isFactor = true;
+			break;
+		case KW_SCREENWIDTH:
+			isFactor = true;
+			break;
+		case KW_SCREENHEIGHT:
+			isFactor = true;
+			break;
+		case LPAREN:
+			isFactor = true;
+			break;
+		default:
+			isFactor = false;
+		}
+		return isFactor;
+	}
+	
+	private boolean predictElem(){
+		return predictFactor();
+	}
+	
+	private boolean predictTerm(){
+		return predictElem();
+	}
+	
+	private boolean predictExpression(){
+		return predictTerm();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
