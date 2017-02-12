@@ -52,15 +52,11 @@ public class Parser {
 	}
 
 	void program() throws SyntaxException {
-		
 		while(scanner.peek() != null){
-			if(predictExpression())
-				expression();
+			if(predictChainElem())
+				chainElem();
 		}
-		
-//		throw new UnimplementedFeatureException();
 	}
-	
 	
 	void expression() throws SyntaxException {
 		term();
@@ -144,13 +140,26 @@ public class Parser {
 	}
 
 	void chainElem() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		if(t.kind == IDENT)
+			consume();
+		else{
+			consume();
+			arg();
+		}
 	}
 
 	void arg() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		if(t.isKind(EOF))
+			return;
+		else{
+			consume();
+			expression();
+			while(t.isKind(COMMA)){
+				consume();
+				expression();
+			}
+			match(RPAREN);
+		}
 	}
 
 	
@@ -262,7 +271,7 @@ public class Parser {
 		}
 	}
 	
-	private boolean predictImageOp() throws SyntaxException{
+	private boolean predictImageOp(){
 		boolean isImageOp;
 		Kind kind = t.kind;
 		switch (kind) {
@@ -530,9 +539,33 @@ public class Parser {
 		return predictTerm();
 	}
 	
+	private boolean predictArg(){
+		boolean isArg;
+		Kind kind = t.kind;
+		switch (kind) {
+		case LPAREN:
+			isArg = true;
+			break;
+		default:
+			isArg = false;
+		}
+		return isArg;
+	}
 	
-	
-	
+	private boolean predictChainElem(){
+		boolean isChainElem;
+		if(t.kind == IDENT)
+			isChainElem = true;
+		else if(predictFilterOp())
+			isChainElem = true;
+		else if(predictFrameOp())
+			isChainElem = true;
+		else if(predictImageOp())
+			isChainElem = true;
+		else
+			isChainElem = false;
+		return isChainElem;
+	}
 	
 	
 	
