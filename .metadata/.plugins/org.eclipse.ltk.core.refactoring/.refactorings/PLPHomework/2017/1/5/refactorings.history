@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Encapsulate field &apos;cop5556sp17.Scanner.ScannerSwitchHelper.startPos&apos; in &apos;cop5556sp17.Scanner.ScannerSwitchHelper&apos;&#x0A;- Original project: &apos;PLPHomework&apos;&#x0A;- Original element: &apos;cop5556sp17.Scanner.ScannerSwitchHelper.startPos&apos;&#x0A;- Getter method name: &apos;getStartPos&apos;&#x0A;- Setter method name: &apos;setStartPos&apos;&#x0A;- Field visibility: &apos;public&apos;&#x0A;- Use getter and setter methods in declaring type" comments="false" declaring="true" description="Encapsulate field &apos;startPos&apos;" flags="589830" getter="getStartPos" id="org.eclipse.jdt.ui.self.encapsulate" input="/src&lt;cop5556sp17{Scanner.java[Scanner[ScannerSwitchHelper^startPos" insertion="6" setter="setStartPos" stamp="1485660143472" version="1.0" visibility="1"/>
-</session>
