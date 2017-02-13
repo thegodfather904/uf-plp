@@ -65,7 +65,7 @@ public class Scanner {
 		posStarts = new ArrayList<Integer>();
 		posStarts.add(new Integer(0));
 	}
-		
+	
 	/**
 	 * Initializes Scanner object by traversing chars and adding tokens to tokens list.
 	 * 
@@ -901,6 +901,13 @@ public class Scanner {
 			return "kind: " + kind.getText() + " pos: " + pos + " length:" + length;
 		}
 		
+		public boolean isKind(Kind someKind){
+			if(this.kind.getText() != null && this.kind.getText().equals(someKind.getText()))
+				return true;
+			else
+				return false;
+		}
+		
 	}
 	
 	/**
@@ -943,14 +950,13 @@ public class Scanner {
 		return tokens.get(tokenNum++);
 	}
 	
-	/*
+	 /*
 	 * Return the next token in the token list without updating the state.
 	 * (So the following call to next will return the same token.)
-	 */
-	public Token peek(){
-		if (tokenNum >= tokens.size())
-			return null;
-		return tokens.get(tokenNum+1);		
+	 */public Token peek() {
+	    if (tokenNum >= tokens.size())
+	        return null;
+	    return tokens.get(tokenNum);
 	}
 
 	/**
