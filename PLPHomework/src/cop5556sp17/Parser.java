@@ -53,8 +53,8 @@ public class Parser {
 
 	void program() throws SyntaxException {
 		while(scanner.peek() != null){
-			if(predictAssign())
-				assign();
+			if(predictBlock())
+				block();
 		}
 	}
 	
@@ -116,7 +116,7 @@ public class Parser {
 
 	void block() throws SyntaxException {
 		//TODO
-		throw new UnimplementedFeatureException();
+//		throw new UnimplementedFeatureException();
 	}
 
 	void paramDec() throws SyntaxException {
@@ -130,8 +130,26 @@ public class Parser {
 	}
 
 	void statement() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		if(t.isKind(OP_SLEEP)){
+			match(OP_SLEEP);
+			if(predictExpression())
+				expression();
+			else
+				throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
+			match(SEMI);
+		}else if(predictWhileStatement())
+			whileStatement();
+		else if(predictIfStatement())
+			ifStatement();
+		else if(predictAssign() && scanner.peek() != null && scanner.peek().isKind(ASSIGN)){
+			assign();
+			match(SEMI);
+		}
+		else if(predictChain()){
+			chain();
+			match(SEMI);
+		}else
+			throw new SyntaxException("In statement but token doesn't match any predict; token: " + t.toString());
 	}
 
 	void chain() throws SyntaxException {
@@ -166,14 +184,49 @@ public class Parser {
 	}
 
 	void assign() throws SyntaxException{
-		consume();
-		consume();
-		expression();
+		match(IDENT);
+		match(ASSIGN);
+		
+		if(predictExpression())
+			expression();
+		else
+			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 	}
 	
+	void whileStatement() throws SyntaxException{
+		match(KW_WHILE);
+		match(LPAREN);
+		
+		if(predictExpression())
+			expression();
+		else
+			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
+		
+		match(RPAREN);
+		
+		if(predictBlock())
+			block();
+		else
+			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+	}
 	
-	
-	
+	void ifStatement() throws SyntaxException{
+		match(KW_IF);
+		match(LPAREN);
+		
+		if(predictExpression())
+			expression();
+		else
+			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
+		
+		match(RPAREN);
+		
+		if(predictBlock())
+			block();
+		else
+			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		
+	}
 	
 	
 	
@@ -585,12 +638,43 @@ public class Parser {
 		return isAssign;
 	}
 	
+	private boolean predictWhileStatement(){
+		boolean isWhile = false;
+		if(t.isKind(KW_WHILE))
+			isWhile = true;
+		return isWhile;
+	}
 	
+	private boolean predictBlock(){
+		boolean isBlock = false;
+		if(t.isKind(LBRACE))
+			isBlock = true;
+		return isBlock;
+	}
 	
+	private boolean predictIfStatement(){
+		boolean isIf = false;
+		if(t.isKind(KW_IF))
+			isIf = true;
+		return isIf;
+	}
 	
-	
-	
-	
+	private boolean predictStatement(){
+		boolean isStatement = false;
+		
+		if(t.isKind(OP_SLEEP))
+			isStatement = true;
+		else if(predictWhileStatement())
+			isStatement = true;
+		else if(predictIfStatement())
+			isStatement = true;
+		else if(predictChain())
+			isStatement = true;
+		else if(predictAssign())
+			isStatement = true;
+		
+		return isStatement;
+	}
 	
 	
 	

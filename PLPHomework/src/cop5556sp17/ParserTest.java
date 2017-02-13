@@ -16,7 +16,7 @@ public class ParserTest {
 	
 	@Test
 	public void filterOpTest() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "test <- one";
+		String input = "blur(x * y + z / 12 != 100) -> test;";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
