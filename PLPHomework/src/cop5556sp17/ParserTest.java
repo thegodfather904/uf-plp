@@ -16,7 +16,7 @@ public class ParserTest {
 	
 	@Test
 	public void filterOpTest() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "blur (one * 123 , 8/16)hide";
+		String input = "test <- one";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);

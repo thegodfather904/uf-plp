@@ -53,8 +53,8 @@ public class Parser {
 
 	void program() throws SyntaxException {
 		while(scanner.peek() != null){
-			if(predictChainElem())
-				chainElem();
+			if(predictAssign())
+				assign();
 		}
 	}
 	
@@ -135,8 +135,13 @@ public class Parser {
 	}
 
 	void chain() throws SyntaxException {
-		//TODO
-		throw new UnimplementedFeatureException();
+		chainElem();
+		arrowOp();
+		chainElem();
+		while(predictArrowOp()){
+			arrowOp();
+			chainElem();
+		}
 	}
 
 	void chainElem() throws SyntaxException {
@@ -149,9 +154,7 @@ public class Parser {
 	}
 
 	void arg() throws SyntaxException {
-		if(t.isKind(EOF))
-			return;
-		else{
+		if(t.isKind(LPAREN)){
 			consume();
 			expression();
 			while(t.isKind(COMMA)){
@@ -162,7 +165,11 @@ public class Parser {
 		}
 	}
 
-	
+	void assign() throws SyntaxException{
+		consume();
+		consume();
+		expression();
+	}
 	
 	
 	
@@ -567,10 +574,16 @@ public class Parser {
 		return isChainElem;
 	}
 	
+	private boolean predictChain(){
+		return predictChainElem();
+	}
 	
-	
-	
-	
+	private boolean predictAssign(){
+		boolean isAssign = false;
+		if(t.kind == IDENT)
+			isAssign = true;
+		return isAssign;
+	}
 	
 	
 	
