@@ -14,15 +14,23 @@ public class ParserTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
+//	@Test
+//	public void test1() throws IllegalCharException, IllegalNumberException, SyntaxException {
+//		String input = "testprogram{while(x * y + z / 12 != 100){sleep x * y + z / 12 != 100;}}";
+//		Scanner scanner = new Scanner(input);
+//		scanner.scan();
+//		Parser parser = new Parser(scanner);
+//		parser.parse();
+//	}
+	
 	@Test
-	public void filterOpTest() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "{while(x * y + z / 12 != 100){sleep x * y + z / 12 != 100;}}";
+	public void test2() throws IllegalCharException, IllegalNumberException, SyntaxException {
+		String input = "testprogram url test, file test{while(x * y + z / 12 != 100){sleep x * y + z / 12 != 100;}}";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		parser.parse();
 	}
-	
 	
 	
 	

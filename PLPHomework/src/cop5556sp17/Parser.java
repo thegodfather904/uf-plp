@@ -52,10 +52,24 @@ public class Parser {
 	}
 
 	void program() throws SyntaxException {
-		while(scanner.peek() != null){
+		match(IDENT);
+		if(predictBlock())
+			block();
+		else if (predictParamDec()){
+			paramDec();
+			while(t.isKind(COMMA)){
+				match(COMMA);
+				if(predictParamDec())
+					paramDec();
+				else
+					throw new SyntaxException("Expected ParamDec but recieved token: " + t.toString());
+			}
 			if(predictBlock())
 				block();
-		}
+			else
+				throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		}else
+			throw new SyntaxException("Expected Block or ParamDec but recieved token: " + t.toString());
 	}
 	
 	void expression() throws SyntaxException {
