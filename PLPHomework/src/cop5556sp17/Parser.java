@@ -115,8 +115,14 @@ public class Parser {
 	}
 
 	void block() throws SyntaxException {
-		//TODO
-//		throw new UnimplementedFeatureException();
+		match(LBRACE);
+		while(predictDec() || predictStatement())
+			if(predictDec())
+				dec();
+			else
+				statement();
+		match(RBRACE);
+		
 	}
 
 	void paramDec() throws SyntaxException {
