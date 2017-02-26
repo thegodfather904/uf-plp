@@ -3,6 +3,12 @@ package cop5556sp17;
 import cop5556sp17.Scanner.Kind;
 import static cop5556sp17.Scanner.Kind.*;
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.BinaryExpression;
+import cop5556sp17.AST.BooleanLitExpression;
+import cop5556sp17.AST.ConstantExpression;
+import cop5556sp17.AST.Expression;
+import cop5556sp17.AST.IdentExpression;
+import cop5556sp17.AST.IntLitExpression;
 
 public class Parser {
 
@@ -46,7 +52,12 @@ public class Parser {
 	 * @throws SyntaxException
 	 */
 	void parse() throws SyntaxException {
-		program();
+		
+		Expression e = expression();
+		
+		System.out.println(e.toString());
+		
+//		program();
 		matchEOF();
 		return;
 	}
@@ -72,60 +83,85 @@ public class Parser {
 			throw new SyntaxException("Expected Block or ParamDec but recieved token: " + t.toString());
 	}
 	
-	void expression() throws SyntaxException {
-		term();
+	Expression expression() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = term();
+		Expression e1 = null;
 		while(predictRelOp()){
+			Token op = t;
 			relOp();
-			term();
+			e1 = term();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void term() throws SyntaxException {
-		elem();
+	Expression term() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = elem();
+		Expression e1 = null;
 		while(predictWeakOp()){
+			Token op = t;
 			weakOp();
-			elem();
+			e1 = elem();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void elem() throws SyntaxException {
-		factor();
+	Expression elem() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = factor();
+		Expression e1 = null;
 		while(predictStrongOp()){
+			Token op = t;
 			strongOp();
-			factor();
+			e1 = factor();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void factor() throws SyntaxException {
+	Expression factor() throws SyntaxException {
+		Expression e = null;
 		Kind kind = t.kind;
 		switch (kind) {
 		case IDENT: {
+			e = new IdentExpression(t);
 			consume();
 		}
 			break;
 		case INT_LIT: {
+			e = new IntLitExpression(t);
 			consume();
 		}
 			break;
 		case KW_TRUE:
 		case KW_FALSE: {
+			e = new BooleanLitExpression(t);
 			consume();
 		}
 			break;
 		case KW_SCREENWIDTH:
 		case KW_SCREENHEIGHT: {
+			e = new ConstantExpression(t);
 			consume();
 		}
 			break;
 		case LPAREN: {
 			consume();
-			expression();
+			e = expression();
 			match(RPAREN);
 		}
 			break;
 		default:
 			throw new SyntaxException("Expected factor but recieved token: " + t.toString());
 		}
+		
+		return e;
 	}
 
 	void block() throws SyntaxException {
