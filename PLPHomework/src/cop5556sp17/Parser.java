@@ -2,13 +2,23 @@ package cop5556sp17;
 
 import cop5556sp17.Scanner.Kind;
 import static cop5556sp17.Scanner.Kind.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import cop5556sp17.Scanner.Token;
 import cop5556sp17.AST.BinaryExpression;
 import cop5556sp17.AST.BooleanLitExpression;
+import cop5556sp17.AST.ChainElem;
 import cop5556sp17.AST.ConstantExpression;
 import cop5556sp17.AST.Expression;
+import cop5556sp17.AST.FilterOpChain;
+import cop5556sp17.AST.FrameOpChain;
+import cop5556sp17.AST.IdentChain;
 import cop5556sp17.AST.IdentExpression;
+import cop5556sp17.AST.ImageOpChain;
 import cop5556sp17.AST.IntLitExpression;
+import cop5556sp17.AST.Tuple;
 
 public class Parser {
 
@@ -53,9 +63,9 @@ public class Parser {
 	 */
 	void parse() throws SyntaxException {
 		
-		Expression e = expression();
+		ChainElem ce = chainElem();
 		
-		System.out.println(e.toString());
+		System.out.println(ce.toString());
 		
 //		program();
 		matchEOF();
@@ -218,25 +228,50 @@ public class Parser {
 		}
 	}
 
-	void chainElem() throws SyntaxException {
-		if(t.kind == IDENT)
+	ChainElem chainElem() throws SyntaxException {
+		ChainElem ce = null;
+		if(t.kind == IDENT){
+			ce = new IdentChain(t);
 			consume();
-		else{
-			consume();
-			arg();
 		}
+		else{
+			Token firstToken = t;
+			Tuple tuple;
+			if(predictFilterOp()){
+				consume();
+				tuple = arg();
+				ce = new FilterOpChain(firstToken, tuple);
+			}else if(predictFrameOp()){
+				consume();
+				tuple = arg();
+				ce = new FrameOpChain(firstToken, tuple);
+			}else if(predictImageOp()){
+				consume();
+				tuple = arg();
+				ce = new ImageOpChain(firstToken, tuple);
+			}
+		}
+		
+		return ce;
 	}
 
-	void arg() throws SyntaxException {
+	Tuple arg() throws SyntaxException {
+		Tuple tuple = null;
 		if(t.isKind(LPAREN)){
+			Token firstToken = t;
+			List<Expression> expList = new ArrayList<Expression>();
 			consume();
-			expression();
+			expList.add(expression());
 			while(t.isKind(COMMA)){
 				consume();
-				expression();
+				expList.add(expression());
 			}
 			match(RPAREN);
+			tuple = new Tuple(firstToken, expList);
+		}else{
+			tuple = new Tuple(t, new ArrayList<Expression>());
 		}
+		return tuple;
 	}
 
 	void assign() throws SyntaxException{
