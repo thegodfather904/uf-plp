@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.AssignmentStatement;
 import cop5556sp17.AST.BinaryExpression;
 import cop5556sp17.AST.BooleanLitExpression;
 import cop5556sp17.AST.ChainElem;
@@ -16,6 +17,7 @@ import cop5556sp17.AST.FilterOpChain;
 import cop5556sp17.AST.FrameOpChain;
 import cop5556sp17.AST.IdentChain;
 import cop5556sp17.AST.IdentExpression;
+import cop5556sp17.AST.IdentLValue;
 import cop5556sp17.AST.ImageOpChain;
 import cop5556sp17.AST.IntLitExpression;
 import cop5556sp17.AST.Tuple;
@@ -63,9 +65,9 @@ public class Parser {
 	 */
 	void parse() throws SyntaxException {
 		
-		ChainElem ce = chainElem();
+		AssignmentStatement as = assign();
 		
-		System.out.println(ce.toString());
+		System.out.println(as.toString());
 		
 //		program();
 		matchEOF();
@@ -274,12 +276,14 @@ public class Parser {
 		return tuple;
 	}
 
-	void assign() throws SyntaxException{
-		match(IDENT);
+	AssignmentStatement assign() throws SyntaxException{
+		Token firstToken = t;
+		IdentLValue identLValue= new IdentLValue(match(IDENT));
 		match(ASSIGN);
-		
-		if(predictExpression())
-			expression();
+		if(predictExpression()){
+			Expression e = expression();
+			return new AssignmentStatement(firstToken, identLValue, e);
+		}
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 	}

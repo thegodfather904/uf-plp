@@ -27,8 +27,7 @@ public class ASTTest {
 
 	@Test
 	public void testFactor0() throws IllegalCharException, IllegalNumberException, SyntaxException {
-//		String input = "((1 * 2) < (3 + 4),(true))";
-		String input = "width ((1 * 2) < (3 + 4),(true))";
+		String input = "test <- (1 * 2) < (3 + 4)";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
