@@ -10,6 +10,7 @@ import cop5556sp17.Scanner.Token;
 import cop5556sp17.AST.AssignmentStatement;
 import cop5556sp17.AST.BinaryChain;
 import cop5556sp17.AST.BinaryExpression;
+import cop5556sp17.AST.Block;
 import cop5556sp17.AST.BooleanLitExpression;
 import cop5556sp17.AST.Chain;
 import cop5556sp17.AST.ChainElem;
@@ -21,10 +22,13 @@ import cop5556sp17.AST.FrameOpChain;
 import cop5556sp17.AST.IdentChain;
 import cop5556sp17.AST.IdentExpression;
 import cop5556sp17.AST.IdentLValue;
+import cop5556sp17.AST.IfStatement;
 import cop5556sp17.AST.ImageOpChain;
 import cop5556sp17.AST.IntLitExpression;
 import cop5556sp17.AST.ParamDec;
+import cop5556sp17.AST.Statement;
 import cop5556sp17.AST.Tuple;
+import cop5556sp17.AST.WhileStatement;
 
 public class Parser {
 
@@ -69,7 +73,7 @@ public class Parser {
 	 */
 	void parse() throws SyntaxException {
 		
-		Chain pd = chain();
+		IfStatement pd = ifStatement();
 		
 		System.out.println(pd.toString());
 		
@@ -180,15 +184,20 @@ public class Parser {
 		return e;
 	}
 
-	void block() throws SyntaxException {
+	Block block() throws SyntaxException {
+		Token firstToken = t;
+		ArrayList<Dec> decList = new ArrayList<Dec>();
+		ArrayList<Statement> statementList = new ArrayList<Statement>();
+		
 		match(LBRACE);
 		while(predictDec() || predictStatement())
 			if(predictDec())
-				dec();
+				decList.add(dec());
 			else
-				statement();
+				statement(); //TODO
 		match(RBRACE);
 		
+		return new Block(firstToken, decList, statementList);
 	}
 
 	ParamDec paramDec() throws SyntaxException {
@@ -318,38 +327,48 @@ public class Parser {
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 	}
 	
-	void whileStatement() throws SyntaxException{
+	WhileStatement whileStatement() throws SyntaxException{
+		Token firstToken = t;
 		match(KW_WHILE);
 		match(LPAREN);
 		
+		Expression e;
 		if(predictExpression())
-			expression();
+			e = expression();
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 		
 		match(RPAREN);
 		
+		Block b;
 		if(predictBlock())
-			block();
+			b = block();
 		else
 			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		
+		return new WhileStatement(firstToken, e, b);
 	}
 	
-	void ifStatement() throws SyntaxException{
+	IfStatement ifStatement() throws SyntaxException{
+		Token firstToken = t;
 		match(KW_IF);
 		match(LPAREN);
 		
+		Expression e;
 		if(predictExpression())
-			expression();
+			e = expression();
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 		
 		match(RPAREN);
 		
+		Block b;
 		if(predictBlock())
-			block();
+			b = block();
 		else
 			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		
+		return new IfStatement(firstToken, e, b);
 		
 	}
 	

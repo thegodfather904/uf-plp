@@ -27,7 +27,7 @@ public class ASTTest {
 
 	@Test
 	public void testFactor0() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "test -> test2 -> test3 -> test4";
+		String input = "if(a < 12){integer test}";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
