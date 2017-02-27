@@ -8,10 +8,13 @@ import java.util.List;
 
 import cop5556sp17.Scanner.Token;
 import cop5556sp17.AST.AssignmentStatement;
+import cop5556sp17.AST.BinaryChain;
 import cop5556sp17.AST.BinaryExpression;
 import cop5556sp17.AST.BooleanLitExpression;
+import cop5556sp17.AST.Chain;
 import cop5556sp17.AST.ChainElem;
 import cop5556sp17.AST.ConstantExpression;
+import cop5556sp17.AST.Dec;
 import cop5556sp17.AST.Expression;
 import cop5556sp17.AST.FilterOpChain;
 import cop5556sp17.AST.FrameOpChain;
@@ -20,6 +23,7 @@ import cop5556sp17.AST.IdentExpression;
 import cop5556sp17.AST.IdentLValue;
 import cop5556sp17.AST.ImageOpChain;
 import cop5556sp17.AST.IntLitExpression;
+import cop5556sp17.AST.ParamDec;
 import cop5556sp17.AST.Tuple;
 
 public class Parser {
@@ -65,9 +69,9 @@ public class Parser {
 	 */
 	void parse() throws SyntaxException {
 		
-		AssignmentStatement as = assign();
+		Chain pd = chain();
 		
-		System.out.println(as.toString());
+		System.out.println(pd.toString());
 		
 //		program();
 		matchEOF();
@@ -187,14 +191,24 @@ public class Parser {
 		
 	}
 
-	void paramDec() throws SyntaxException {
-		consume();
-		match(IDENT);
+	ParamDec paramDec() throws SyntaxException {
+		if(predictType()){
+			Token firstToken = t;
+			consume();
+			return new ParamDec(firstToken, match(IDENT));
+		}else{
+			throw new SyntaxException("Expected Dec but recieved token: " + t.toString());
+		}
 	}
 
-	void dec() throws SyntaxException {
-		consume();
-		match(IDENT);
+	Dec dec() throws SyntaxException {
+		if(predictType()){
+			Token firstToken = t;
+			consume();
+			return new Dec(firstToken, match(IDENT));
+		}else{
+			throw new SyntaxException("Expected Dec but recieved token: " + t.toString());
+		}
 	}
 
 	void statement() throws SyntaxException {
@@ -220,14 +234,30 @@ public class Parser {
 			throw new SyntaxException("In statement but token doesn't match any predict; token: " + t.toString());
 	}
 
-	void chain() throws SyntaxException {
-		chainElem();
-		arrowOp();
-		chainElem();
+	Chain chain() throws SyntaxException {
+		Token firstToken = t;
+		
+		BinaryChain bc = null;
+		ChainElem ce1 = chainElem();
+		Token arrowOp = null;;
+		if(predictArrowOp()){
+			arrowOp = t;
+			consume();
+		}else
+			throw new SyntaxException("In Chain but token doesn't match arrowOp; token: " + t.toString());
+		
+		ChainElem ce2 = chainElem();
+		bc = new BinaryChain(firstToken, ce1, arrowOp, ce2);
+		
 		while(predictArrowOp()){
-			arrowOp();
-			chainElem();
+			arrowOp = t;
+			consume();
+			ce2 = chainElem();
+			bc = new BinaryChain(firstToken, bc, arrowOp, ce2);
 		}
+		
+		return bc;
+		
 	}
 
 	ChainElem chainElem() throws SyntaxException {
@@ -771,6 +801,30 @@ public class Parser {
 		return isStatement;
 	}
 	
+	private boolean predictType(){
+		boolean isType;
+		Kind kind = t.kind;
+		switch (kind) {
+		case KW_INTEGER:
+			isType = true;
+			break;
+		case KW_IMAGE:
+			isType = true;
+			break;
+		case KW_FRAME:
+			isType = true;
+			break;
+		case KW_FILE:
+			isType = true;
+			break;
+		case KW_BOOLEAN:
+			isType = true;
+			break;
+		default:
+			isType = false;
+		}
+		return isType;
+	}
 	
 	
 	

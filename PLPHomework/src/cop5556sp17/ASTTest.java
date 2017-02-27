@@ -27,7 +27,7 @@ public class ASTTest {
 
 	@Test
 	public void testFactor0() throws IllegalCharException, IllegalNumberException, SyntaxException {
-		String input = "test <- (1 * 2) < (3 + 4)";
+		String input = "test -> test2 -> test3 -> test4";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
