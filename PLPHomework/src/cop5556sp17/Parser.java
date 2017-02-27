@@ -2,7 +2,35 @@ package cop5556sp17;
 
 import cop5556sp17.Scanner.Kind;
 import static cop5556sp17.Scanner.Kind.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.AssignmentStatement;
+import cop5556sp17.AST.BinaryChain;
+import cop5556sp17.AST.BinaryExpression;
+import cop5556sp17.AST.Block;
+import cop5556sp17.AST.BooleanLitExpression;
+import cop5556sp17.AST.Chain;
+import cop5556sp17.AST.ChainElem;
+import cop5556sp17.AST.ConstantExpression;
+import cop5556sp17.AST.Dec;
+import cop5556sp17.AST.Expression;
+import cop5556sp17.AST.FilterOpChain;
+import cop5556sp17.AST.FrameOpChain;
+import cop5556sp17.AST.IdentChain;
+import cop5556sp17.AST.IdentExpression;
+import cop5556sp17.AST.IdentLValue;
+import cop5556sp17.AST.IfStatement;
+import cop5556sp17.AST.ImageOpChain;
+import cop5556sp17.AST.IntLitExpression;
+import cop5556sp17.AST.ParamDec;
+import cop5556sp17.AST.Program;
+import cop5556sp17.AST.SleepStatement;
+import cop5556sp17.AST.Statement;
+import cop5556sp17.AST.Tuple;
+import cop5556sp17.AST.WhileStatement;
 
 public class Parser {
 
@@ -45,206 +73,312 @@ public class Parser {
 	 * 
 	 * @throws SyntaxException
 	 */
-	void parse() throws SyntaxException {
-		program();
+	Program parse() throws SyntaxException {
+		Program p = program();
 		matchEOF();
-		return;
+		return p;
 	}
 
-	void program() throws SyntaxException {
+	Program program() throws SyntaxException {
+		
+		Token firstToken = t;
+		ArrayList<ParamDec> paramDecList = new ArrayList<ParamDec>();
+		Block b = null;
+		
 		match(IDENT);
 		if(predictBlock())
-			block();
+			b = block();
 		else if (predictParamDec()){
-			paramDec();
+			paramDecList.add(paramDec());
 			while(t.isKind(COMMA)){
 				match(COMMA);
 				if(predictParamDec())
-					paramDec();
+					paramDecList.add(paramDec());
 				else
 					throw new SyntaxException("Expected ParamDec but recieved token: " + t.toString());
 			}
 			if(predictBlock())
-				block();
+				b = block();
 			else
 				throw new SyntaxException("Expected Block but recieved token: " + t.toString());
 		}else
 			throw new SyntaxException("Expected Block or ParamDec but recieved token: " + t.toString());
+		
+		return new Program(firstToken, paramDecList, b);
 	}
 	
-	void expression() throws SyntaxException {
-		term();
+	Expression expression() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = term();
+		Expression e1 = null;
 		while(predictRelOp()){
+			Token op = t;
 			relOp();
-			term();
+			e1 = term();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void term() throws SyntaxException {
-		elem();
+	Expression term() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = elem();
+		Expression e1 = null;
 		while(predictWeakOp()){
+			Token op = t;
 			weakOp();
-			elem();
+			e1 = elem();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void elem() throws SyntaxException {
-		factor();
+	Expression elem() throws SyntaxException {
+		Token firstToken = t;
+		Expression e0 = factor();
+		Expression e1 = null;
 		while(predictStrongOp()){
+			Token op = t;
 			strongOp();
-			factor();
+			e1 = factor();
+			e0 = new BinaryExpression(firstToken, e0, op, e1);
 		}
+		
+		return e0;
 	}
 
-	void factor() throws SyntaxException {
+	Expression factor() throws SyntaxException {
+		Expression e = null;
 		Kind kind = t.kind;
 		switch (kind) {
 		case IDENT: {
+			e = new IdentExpression(t);
 			consume();
 		}
 			break;
 		case INT_LIT: {
+			e = new IntLitExpression(t);
 			consume();
 		}
 			break;
 		case KW_TRUE:
 		case KW_FALSE: {
+			e = new BooleanLitExpression(t);
 			consume();
 		}
 			break;
 		case KW_SCREENWIDTH:
 		case KW_SCREENHEIGHT: {
+			e = new ConstantExpression(t);
 			consume();
 		}
 			break;
 		case LPAREN: {
 			consume();
-			expression();
+			e = expression();
 			match(RPAREN);
 		}
 			break;
 		default:
 			throw new SyntaxException("Expected factor but recieved token: " + t.toString());
 		}
+		
+		return e;
 	}
 
-	void block() throws SyntaxException {
+	Block block() throws SyntaxException {
+		Token firstToken = t;
+		ArrayList<Dec> decList = new ArrayList<Dec>();
+		ArrayList<Statement> statementList = new ArrayList<Statement>();
+		
 		match(LBRACE);
 		while(predictDec() || predictStatement())
 			if(predictDec())
-				dec();
+				decList.add(dec());
 			else
-				statement();
+				statementList.add(statement());
 		match(RBRACE);
 		
+		return new Block(firstToken, decList, statementList);
 	}
 
-	void paramDec() throws SyntaxException {
-		consume();
-		match(IDENT);
+	ParamDec paramDec() throws SyntaxException {
+		if(predictType()){
+			Token firstToken = t;
+			consume();
+			return new ParamDec(firstToken, match(IDENT));
+		}else{
+			throw new SyntaxException("Expected Dec but recieved token: " + t.toString());
+		}
 	}
 
-	void dec() throws SyntaxException {
-		consume();
-		match(IDENT);
+	Dec dec() throws SyntaxException {
+		if(predictType()){
+			Token firstToken = t;
+			consume();
+			return new Dec(firstToken, match(IDENT));
+		}else{
+			throw new SyntaxException("Expected Dec but recieved token: " + t.toString());
+		}
 	}
 
-	void statement() throws SyntaxException {
+	Statement statement() throws SyntaxException {
+		Statement s = null;
+		Token firstToken = t;
 		if(t.isKind(OP_SLEEP)){
 			match(OP_SLEEP);
+			Expression e;
 			if(predictExpression())
-				expression();
+				e = expression();
 			else
 				throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
+			s = new SleepStatement(firstToken, e);
 			match(SEMI);
 		}else if(predictWhileStatement())
-			whileStatement();
+			s = whileStatement();
 		else if(predictIfStatement())
-			ifStatement();
+			s = ifStatement();
 		else if(predictAssign() && scanner.peek() != null && scanner.peek().isKind(ASSIGN)){
-			assign();
+			s = assign();
 			match(SEMI);
 		}
 		else if(predictChain()){
-			chain();
+			s = chain();
 			match(SEMI);
 		}else
 			throw new SyntaxException("In statement but token doesn't match any predict; token: " + t.toString());
+		
+		return s;
 	}
 
-	void chain() throws SyntaxException {
-		chainElem();
-		arrowOp();
-		chainElem();
+	Chain chain() throws SyntaxException {
+		Token firstToken = t;
+		
+		BinaryChain bc = null;
+		ChainElem ce1 = chainElem();
+		Token arrowOp = null;;
+		if(predictArrowOp()){
+			arrowOp = t;
+			consume();
+		}else
+			throw new SyntaxException("In Chain but token doesn't match arrowOp; token: " + t.toString());
+		
+		ChainElem ce2 = chainElem();
+		bc = new BinaryChain(firstToken, ce1, arrowOp, ce2);
+		
 		while(predictArrowOp()){
-			arrowOp();
-			chainElem();
+			arrowOp = t;
+			consume();
+			ce2 = chainElem();
+			bc = new BinaryChain(firstToken, bc, arrowOp, ce2);
 		}
+		
+		return bc;
+		
 	}
 
-	void chainElem() throws SyntaxException {
-		if(t.kind == IDENT)
+	ChainElem chainElem() throws SyntaxException {
+		ChainElem ce = null;
+		if(t.kind == IDENT){
+			ce = new IdentChain(t);
 			consume();
+		}
 		else{
-			consume();
-			arg();
+			Token firstToken = t;
+			Tuple tuple;
+			if(predictFilterOp()){
+				consume();
+				tuple = arg();
+				ce = new FilterOpChain(firstToken, tuple);
+			}else if(predictFrameOp()){
+				consume();
+				tuple = arg();
+				ce = new FrameOpChain(firstToken, tuple);
+			}else if(predictImageOp()){
+				consume();
+				tuple = arg();
+				ce = new ImageOpChain(firstToken, tuple);
+			}
 		}
+		
+		return ce;
 	}
 
-	void arg() throws SyntaxException {
+	Tuple arg() throws SyntaxException {
+		Tuple tuple = null;
 		if(t.isKind(LPAREN)){
+			Token firstToken = t;
+			List<Expression> expList = new ArrayList<Expression>();
 			consume();
-			expression();
+			expList.add(expression());
 			while(t.isKind(COMMA)){
 				consume();
-				expression();
+				expList.add(expression());
 			}
 			match(RPAREN);
+			tuple = new Tuple(firstToken, expList);
+		}else{
+			tuple = new Tuple(t, new ArrayList<Expression>());
 		}
+		return tuple;
 	}
 
-	void assign() throws SyntaxException{
-		match(IDENT);
+	AssignmentStatement assign() throws SyntaxException{
+		Token firstToken = t;
+		IdentLValue identLValue= new IdentLValue(match(IDENT));
 		match(ASSIGN);
-		
-		if(predictExpression())
-			expression();
+		if(predictExpression()){
+			Expression e = expression();
+			return new AssignmentStatement(firstToken, identLValue, e);
+		}
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 	}
 	
-	void whileStatement() throws SyntaxException{
+	WhileStatement whileStatement() throws SyntaxException{
+		Token firstToken = t;
 		match(KW_WHILE);
 		match(LPAREN);
 		
+		Expression e;
 		if(predictExpression())
-			expression();
+			e = expression();
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 		
 		match(RPAREN);
 		
+		Block b;
 		if(predictBlock())
-			block();
+			b = block();
 		else
 			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		
+		return new WhileStatement(firstToken, e, b);
 	}
 	
-	void ifStatement() throws SyntaxException{
+	IfStatement ifStatement() throws SyntaxException{
+		Token firstToken = t;
 		match(KW_IF);
 		match(LPAREN);
 		
+		Expression e;
 		if(predictExpression())
-			expression();
+			e = expression();
 		else
 			throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
 		
 		match(RPAREN);
 		
+		Block b;
 		if(predictBlock())
-			block();
+			b = block();
 		else
 			throw new SyntaxException("Expected Block but recieved token: " + t.toString());
+		
+		return new IfStatement(firstToken, e, b);
 		
 	}
 	
@@ -696,6 +830,33 @@ public class Parser {
 		return isStatement;
 	}
 	
+	private boolean predictType(){
+		boolean isType;
+		Kind kind = t.kind;
+		switch (kind) {
+		case KW_INTEGER:
+			isType = true;
+			break;
+		case KW_IMAGE:
+			isType = true;
+			break;
+		case KW_FRAME:
+			isType = true;
+			break;
+		case KW_FILE:
+			isType = true;
+			break;
+		case KW_BOOLEAN:
+			isType = true;
+			break;
+		case KW_URL:
+			isType = true;
+			break;
+		default:
+			isType = false;
+		}
+		return isType;
+	}
 	
 	
 	
