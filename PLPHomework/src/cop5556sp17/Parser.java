@@ -26,6 +26,8 @@ import cop5556sp17.AST.IfStatement;
 import cop5556sp17.AST.ImageOpChain;
 import cop5556sp17.AST.IntLitExpression;
 import cop5556sp17.AST.ParamDec;
+import cop5556sp17.AST.Program;
+import cop5556sp17.AST.SleepStatement;
 import cop5556sp17.AST.Statement;
 import cop5556sp17.AST.Tuple;
 import cop5556sp17.AST.WhileStatement;
@@ -71,36 +73,38 @@ public class Parser {
 	 * 
 	 * @throws SyntaxException
 	 */
-	void parse() throws SyntaxException {
-		
-		IfStatement pd = ifStatement();
-		
-		System.out.println(pd.toString());
-		
-//		program();
+	Program parse() throws SyntaxException {
+		Program p = program();
 		matchEOF();
-		return;
+		return p;
 	}
 
-	void program() throws SyntaxException {
+	Program program() throws SyntaxException {
+		
+		Token firstToken = t;
+		ArrayList<ParamDec> paramDecList = new ArrayList<ParamDec>();
+		Block b = null;
+		
 		match(IDENT);
 		if(predictBlock())
-			block();
+			b = block();
 		else if (predictParamDec()){
-			paramDec();
+			paramDecList.add(paramDec());
 			while(t.isKind(COMMA)){
 				match(COMMA);
 				if(predictParamDec())
-					paramDec();
+					paramDecList.add(paramDec());
 				else
 					throw new SyntaxException("Expected ParamDec but recieved token: " + t.toString());
 			}
 			if(predictBlock())
-				block();
+				b = block();
 			else
 				throw new SyntaxException("Expected Block but recieved token: " + t.toString());
 		}else
 			throw new SyntaxException("Expected Block or ParamDec but recieved token: " + t.toString());
+		
+		return new Program(firstToken, paramDecList, b);
 	}
 	
 	Expression expression() throws SyntaxException {
@@ -194,7 +198,7 @@ public class Parser {
 			if(predictDec())
 				decList.add(dec());
 			else
-				statement(); //TODO
+				statementList.add(statement());
 		match(RBRACE);
 		
 		return new Block(firstToken, decList, statementList);
@@ -220,27 +224,33 @@ public class Parser {
 		}
 	}
 
-	void statement() throws SyntaxException {
+	Statement statement() throws SyntaxException {
+		Statement s = null;
+		Token firstToken = t;
 		if(t.isKind(OP_SLEEP)){
 			match(OP_SLEEP);
+			Expression e;
 			if(predictExpression())
-				expression();
+				e = expression();
 			else
 				throw new SyntaxException("Expected Expression but recieved token: " + t.toString());
+			s = new SleepStatement(firstToken, e);
 			match(SEMI);
 		}else if(predictWhileStatement())
-			whileStatement();
+			s = whileStatement();
 		else if(predictIfStatement())
-			ifStatement();
+			s = ifStatement();
 		else if(predictAssign() && scanner.peek() != null && scanner.peek().isKind(ASSIGN)){
-			assign();
+			s = assign();
 			match(SEMI);
 		}
 		else if(predictChain()){
-			chain();
+			s = chain();
 			match(SEMI);
 		}else
 			throw new SyntaxException("In statement but token doesn't match any predict; token: " + t.toString());
+		
+		return s;
 	}
 
 	Chain chain() throws SyntaxException {
@@ -837,6 +847,9 @@ public class Parser {
 			isType = true;
 			break;
 		case KW_BOOLEAN:
+			isType = true;
+			break;
+		case KW_URL:
 			isType = true;
 			break;
 		default:
