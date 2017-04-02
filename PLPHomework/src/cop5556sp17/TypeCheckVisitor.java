@@ -30,6 +30,8 @@ import cop5556sp17.AST.WhileStatement;
 
 import java.util.ArrayList;
 
+import com.sun.xml.internal.ws.policy.sourcemodel.ModelNode.Type;
+
 import cop5556sp17.Scanner.Kind;
 import cop5556sp17.Scanner.LinePos;
 import cop5556sp17.Scanner.Token;
@@ -92,7 +94,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitBooleanLitExpression(BooleanLitExpression booleanLitExpression, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		booleanLitExpression.setTypeName(TypeName.BOOLEAN);
 		return null;
 	}
 
@@ -128,7 +130,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitIntLitExpression(IntLitExpression intLitExpression, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		intLitExpression.setTypeName(TypeName.INTEGER);
 		return null;
 	}
 
@@ -175,6 +177,12 @@ public class TypeCheckVisitor implements ASTVisitor {
 		
 		//visit expression
 		assignStatement.getE().visit(this, null);
+		
+		TypeName identLType = symtab.lookup(assignStatement.getVar().getText()).getTypeName();
+		TypeName expressionType = assignStatement.getE().getTypeName();
+		
+		if(identLType != expressionType)
+			throw new TypeCheckException("Wrong type in assignment: " + identLType + " -> " + expressionType);
 		
 		return null;
 	}

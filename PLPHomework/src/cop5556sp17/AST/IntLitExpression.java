@@ -5,7 +5,7 @@ import cop5556sp17.Scanner.Token;
 public class IntLitExpression extends Expression {
 
 	public final int value;
-
+	
 	public IntLitExpression(Token firstToken) {
 		super(firstToken);
 		value = firstToken.intVal();
@@ -48,5 +48,4 @@ public class IntLitExpression extends Expression {
 	public Object visit(ASTVisitor v, Object arg) throws Exception {
 		return v.visitIntLitExpression(this, arg);
 	}
-
 }

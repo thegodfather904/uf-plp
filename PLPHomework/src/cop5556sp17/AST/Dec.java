@@ -1,11 +1,13 @@
 package cop5556sp17.AST;
 
 import cop5556sp17.Scanner.Token;
+import cop5556sp17.AST.Type.TypeName;
 
 public class Dec extends ASTNode {
 	
 	final Token ident;
-
+	private TypeName typeName;
+	
 	public Dec(Token firstToken, Token ident) {
 		super(firstToken);
 
@@ -60,6 +62,14 @@ public class Dec extends ASTNode {
 	@Override
 	public Object visit(ASTVisitor v, Object arg) throws Exception {
 		return v.visitDec(this,arg);
+	}
+
+	public TypeName getTypeName() {
+		return typeName;
+	}
+
+	public void setTypeName(TypeName typeName) {
+		this.typeName = typeName;
 	}
 
 }

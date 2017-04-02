@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import cop5556sp17.AST.ASTNode;
 import cop5556sp17.AST.Dec;
+import cop5556sp17.AST.Type;
 
 
 public class SymbolTable {
@@ -70,28 +71,36 @@ public class SymbolTable {
 		scopeStackStack.pop();
 	}
 	
-	/**
-	 * Returns the current scope number being used
-	 * 
-	 * @return
-	 */
-	private int currentScopeNumber(){
-		return scopeStackStack.peek().getCurrentScope();
-	}
-	
-	
 	/*True if insert was successfull, false if duplicate record*/
 	public boolean insert(String ident, Dec dec){
 		
+		boolean success;
+		
 		//check if already in the symbol table
 		if(lcTable.containsKey(ident))
-			return false;
+			success = false;
 		else{
+			try{
+				addTypeName(dec);
+			}catch(Exception e){
+				success = false;
+			}
 			insertIntoLcTable(ident, dec);
 			pushOntoScopeStackStack(dec);
+			
+			success = true;
 		}
 			
-		return true;
+		return success;
+	}
+	
+	private void addTypeName(Dec dec)throws Exception{
+		try{
+			dec.setTypeName(Type.getTypeName(dec.getFirstToken()));
+		}catch(Exception e){
+			throw new Exception("Illegal type for dec");
+		}
+		
 	}
 	
 	/**
