@@ -138,7 +138,19 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit each ParamDec
+		try{
+			for(ParamDec pd : program.getParams())
+				symtab.getLcTable().put(pd.getIdent().getText(), new SymbolTableObject(symtab.getCurrentScope(), pd));
+		}catch(Exception e){
+			throw new Exception("Duplicate param dec found in program");
+		}
+		
+		//visit the block
+//		program.getB().visit(v, arg)
+		
+		
 		return null;
 	}
 
