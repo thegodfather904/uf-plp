@@ -4,6 +4,8 @@ import cop5556sp17.Scanner.Token;
 
 public class IdentLValue extends ASTNode {
 	
+	private Dec dec;
+	
 	public IdentLValue(Token firstToken) {
 		super(firstToken);
 	}
@@ -20,6 +22,14 @@ public class IdentLValue extends ASTNode {
 
 	public String getText() {
 		return firstToken.getText();
+	}
+
+	public Dec getDec() {
+		return dec;
+	}
+
+	public void setDec(Dec dec) {
+		this.dec = dec;
 	}
 
 }

@@ -31,28 +31,42 @@ public class TypeCheckVisitorTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@Test
-	public void testAssignmentBoolLit0() throws Exception{
-		String input = "p {\nboolean y \ny <- false;}";
+	@Test 
+	public void myTest() throws Exception {
+		String input = "testProgram {integer test test <- 12;}";
+//		String input = "test url test2, url test3 {test <- 10 + 7;}";
+//		String input = "test url test2, url test3 {if(a < 12){integer test} if(a < 12){integer test}}";
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		Program program = parser.parse();
 		TypeCheckVisitor v = new TypeCheckVisitor();
-		program.visit(v, null);		
+		program.visit(v, null);	
 	}
-
-	@Test
-	public void testAssignmentBoolLitError0() throws Exception{
-		String input = "p {\nboolean y \ny <- 3;}";
-		Scanner scanner = new Scanner(input);
-		scanner.scan();
-		Parser parser = new Parser(scanner);
-		ASTNode program = parser.parse();
-		TypeCheckVisitor v = new TypeCheckVisitor();
-		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
-		program.visit(v, null);		
-	}		
+	
+	
+//	@Test
+//	public void testAssignmentBoolLit0() throws Exception{
+//		String input = "p {\nboolean y \ny <- false;}";
+//		Scanner scanner = new Scanner(input);
+//		scanner.scan();
+//		Parser parser = new Parser(scanner);
+//		Program program = parser.parse();
+//		TypeCheckVisitor v = new TypeCheckVisitor();
+//		program.visit(v, null);		
+//	}
+//
+//	@Test
+//	public void testAssignmentBoolLitError0() throws Exception{
+//		String input = "p {\nboolean y \ny <- 3;}";
+//		Scanner scanner = new Scanner(input);
+//		scanner.scan();
+//		Parser parser = new Parser(scanner);
+//		ASTNode program = parser.parse();
+//		TypeCheckVisitor v = new TypeCheckVisitor();
+//		thrown.expect(TypeCheckVisitor.TypeCheckException.class);
+//		program.visit(v, null);		
+//	}		
 
 
 

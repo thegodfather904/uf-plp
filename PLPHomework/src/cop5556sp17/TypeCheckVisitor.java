@@ -72,7 +72,21 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitBlock(Block block, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//enter scope
+		symtab.enterScope();
+		
+		//visit list<dec>
+		for(Dec dec : block.getDecs())
+			visitDec(dec, null);
+		
+		//visit list<statement>
+		for(Statement statement : block.getStatements())
+			statement.visit(this, null);
+			
+		//leave scope
+		symtab.leaveScope();
+		
 		return null;
 	}
 
@@ -132,43 +146,61 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		if(!symtab.insert(declaration.getIdent().getText(), declaration))
+			throw new Exception("Duplicate param dec found in program");
+		
 		return null;
 	}
 
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
-		
-		//visit each ParamDec
-		try{
-			for(ParamDec pd : program.getParams())
-				symtab.getLcTable().put(pd.getIdent().getText(), new SymbolTableObject(symtab.getCurrentScope(), pd));
-		}catch(Exception e){
-			throw new Exception("Duplicate param dec found in program");
-		}
+		//visit each ParamDec (throws error if duplicate dec found)
+		for(ParamDec pd : program.getParams())
+			visitParamDec(pd, null);
 		
 		//visit the block
-//		program.getB().visit(v, arg)
+		program.getB().visit(this, null);
 		
+		//leave the scope
+		symtab.leaveScope();
 		
 		return null;
 	}
 
 	@Override
 	public Object visitAssignmentStatement(AssignmentStatement assignStatement, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit identLvalue
+		visitIdentLValue(assignStatement.getVar(), null);
+		
+		//visit expression
+		assignStatement.getE().visit(this, null);
+		
 		return null;
 	}
 
 	@Override
 	public Object visitIdentLValue(IdentLValue identX, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//condition: ident has been declared and is visible in current scope
+		Dec dec = symtab.lookup(identX.getText());
+		if(dec == null)
+			throw new Exception("Ident was never declared");
+		
+		if(!symtab.isIdentVisible(identX.getText()))
+			throw new Exception("Ident was declared but is not visisble in the current block");
+		
+		//set ident dec to dec of ident
+		identX.setDec(dec);
+		
 		return null;
 	}
 
 	@Override
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		if(!symtab.insert(paramDec.getIdent().getText(), paramDec))
+			throw new Exception("Duplicate param dec found in program");
+		
 		return null;
 	}
 

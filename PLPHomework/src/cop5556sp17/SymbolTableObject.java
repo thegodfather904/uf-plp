@@ -1,19 +1,19 @@
 package cop5556sp17;
 
-import cop5556sp17.AST.ASTNode;
+import cop5556sp17.AST.Dec;
 
 public class SymbolTableObject {
 	
 	private int scopeNumber;
-	private ASTNode node;
+	private Dec dec;
 	
 	public SymbolTableObject(){
 		
 	}
 	
-	public SymbolTableObject(int scopeNumber, ASTNode node){
+	public SymbolTableObject(int scopeNumber, Dec dec){
 		this.scopeNumber = scopeNumber;
-		this.node = node;
+		this.dec = dec;
 	}
 	
 	public int getScopeNumber() {
@@ -22,11 +22,13 @@ public class SymbolTableObject {
 	public void setScopeNumber(int scopeNumber) {
 		this.scopeNumber = scopeNumber;
 	}
-	public ASTNode getNode() {
-		return node;
+
+	public Dec getDec() {
+		return dec;
 	}
-	public void setNode(ASTNode node) {
-		this.node = node;
+
+	public void setDec(Dec dec) {
+		this.dec = dec;
 	}
 	
 }
