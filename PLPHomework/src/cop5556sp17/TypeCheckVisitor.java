@@ -118,7 +118,24 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitIdentExpression(IdentExpression identExpression, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//ident declared and in current scope
+		String ident = identExpression.getFirstToken().getText();
+		
+		Dec dec = symtab.lookup(ident);
+		if(dec == null)
+			throw new Exception("Ident was never declared");
+		
+		if(!symtab.isIdentVisible(ident))
+			throw new Exception("Ident was declared but is not visisble in the current block");
+		
+		//Set the ident expression to the type of the ident
+		identExpression.setTypeName(dec.getTypeName());
+		
+		//Set the ident expression dec to the dec of the ident
+		identExpression.setDec(dec);
+		
+		
 		return null;
 	}
 
@@ -214,7 +231,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitConstantExpression(ConstantExpression constantExpression, Object arg) {
-		// TODO Auto-generated method stub
+		constantExpression.setTypeName(TypeName.INTEGER);
 		return null;
 	}
 
