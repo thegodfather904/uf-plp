@@ -184,10 +184,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 		
 		Dec dec = symtab.lookup(ident);
 		if(dec == null)
-			throw new Exception("Ident was never declared");
+			throw new TypeCheckException("Ident was never declared");
 		
 		if(!symtab.isIdentVisible(ident))
-			throw new Exception("Ident was declared but is not visisble in the current block");
+			throw new TypeCheckException("Ident was declared but is not visisble in the current block");
 		
 		//Set the ident expression to the type of the ident
 		identExpression.setTypeName(dec.getTypeName());
@@ -201,7 +201,16 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitIfStatement(IfStatement ifStatement, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit expression and verify type is boolean
+		ifStatement.getE().visit(this, null);
+		
+		if(!ifStatement.getE().getTypeName().isType(TypeName.BOOLEAN))
+			throw new TypeCheckException("If statement: expression type is : " + ifStatement.getE().getTypeName());
+		
+		//visit block
+		ifStatement.getB().visit(this, null);
+		
 		return null;
 	}
 
@@ -226,14 +235,23 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit expression and verify type is boolean
+		whileStatement.getE().visit(this, null);
+		
+		if(!whileStatement.getE().getTypeName().isType(TypeName.BOOLEAN))
+			throw new TypeCheckException("If statement: expression type is : " + whileStatement.getE().getTypeName());
+		
+		//visit block
+		whileStatement.getB().visit(this, null);
+		
 		return null;
 	}
 
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
 		if(!symtab.insert(declaration.getIdent().getText(), declaration))
-			throw new Exception("Duplicate param dec found in program");
+			throw new TypeCheckException("Duplicate param dec found in program");
 		
 		return null;
 	}
@@ -277,10 +295,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 		//condition: ident has been declared and is visible in current scope
 		Dec dec = symtab.lookup(identX.getText());
 		if(dec == null)
-			throw new Exception("Ident was never declared");
+			throw new TypeCheckException("Ident was never declared");
 		
 		if(!symtab.isIdentVisible(identX.getText()))
-			throw new Exception("Ident was declared but is not visisble in the current block");
+			throw new TypeCheckException("Ident was declared but is not visisble in the current block");
 		
 		//set ident dec to dec of ident
 		identX.setDec(dec);
@@ -291,7 +309,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
 		if(!symtab.insert(paramDec.getIdent().getText(), paramDec))
-			throw new Exception("Duplicate param dec found in program");
+			throw new TypeCheckException("Duplicate param dec found in program");
 		
 		return null;
 	}
