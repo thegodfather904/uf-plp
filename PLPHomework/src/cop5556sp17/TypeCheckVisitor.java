@@ -213,7 +213,14 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitSleepStatement(SleepStatement sleepStatement, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit the expression
+		sleepStatement.getE().visit(this, null);
+
+		//if expression type not integer, throw exception
+		if(!sleepStatement.getE().getTypeName().isType(TypeName.INTEGER))
+			throw new TypeCheckException("Sleep statement: expression type is : " + sleepStatement.getE().getTypeName());
+		
 		return null;
 	}
 
