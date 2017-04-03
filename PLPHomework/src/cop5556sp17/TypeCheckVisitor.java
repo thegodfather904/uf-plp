@@ -30,7 +30,7 @@ import cop5556sp17.AST.WhileStatement;
 
 import java.util.ArrayList;
 
-import com.sun.xml.internal.ws.policy.sourcemodel.ModelNode.Type;
+import com.sun.xml.internal.ws.policy.sourcemodel.ModelNode.Type; /*TODO*/
 
 import cop5556sp17.Scanner.Kind;
 import cop5556sp17.Scanner.LinePos;
@@ -68,7 +68,67 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit both the binary expressions
+		binaryExpression.getE0().visit(this, null);
+		binaryExpression.getE1().visit(this, null);
+		
+		//get the types for the expressions
+		TypeName e0Type = binaryExpression.getE0().getTypeName();
+		TypeName e1Type = binaryExpression.getE1().getTypeName();
+		
+		Token op = binaryExpression.getOp();
+		
+		
+		if(op.isKind(EQUAL) || op.isKind(NOTEQUAL))
+			if(e0Type.equals(e1Type))
+				binaryExpression.setTypeName(TypeName.BOOLEAN);
+			else
+				throw new TypeCheckException("Types are not equal in binary expression");
+		else{
+			if(e0Type.isType(TypeName.INTEGER) && e1Type.isType(TypeName.INTEGER)){
+				switch(op.kind){
+					case PLUS:
+					case MINUS:
+					case TIMES:
+					case DIV:
+						binaryExpression.setTypeName(TypeName.INTEGER);
+						break;
+					case LT:
+					case GT:
+					case LE:
+					case GE:
+						binaryExpression.setTypeName(TypeName.BOOLEAN);
+						break;
+					
+				}
+			}else if (e0Type.isType(TypeName.IMAGE) && e1Type.isType(TypeName.IMAGE)){
+				switch(op.kind){
+				case PLUS:
+				case MINUS:
+					binaryExpression.setTypeName(TypeName.IMAGE);
+					break;
+				}
+			}else if ((e0Type.isType(TypeName.IMAGE) && e1Type.isType(TypeName.INTEGER)) ||
+					(e0Type.isType(TypeName.INTEGER) && e1Type.isType(TypeName.IMAGE))){
+				switch(op.kind){
+				case TIMES:
+					binaryExpression.setTypeName(TypeName.IMAGE);
+					break;
+				}
+			}else if (e0Type.isType(TypeName.BOOLEAN) && e1Type.isType(TypeName.BOOLEAN)){
+				switch(op.kind){
+					case LT:
+					case GT:
+					case LE:
+					case GE:
+					binaryExpression.setTypeName(TypeName.BOOLEAN);
+					break;
+				}
+			}
+		}
+			
+			
 		return null;
 	}
 
