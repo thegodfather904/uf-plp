@@ -323,7 +323,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
 		if(!symtab.insert(declaration.getIdent().getText(), declaration))
-			throw new TypeCheckException("Duplicate param dec found in program");
+			throw new TypeCheckException("Duplicate param dec found in program at same scope");
 		
 		return null;
 	}

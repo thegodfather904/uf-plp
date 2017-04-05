@@ -76,8 +76,8 @@ public class SymbolTable {
 		
 		boolean success;
 		
-		//check if already in the symbol table
-		if(lcTable.containsKey(ident))
+		//check if already in the symbol table at same scope level
+		if(lcTable.containsKey(ident) && lcTable.get(ident).getScopeNumber() == scopeStackStack.peek().getCurrentScope())
 			success = false;
 		else{
 			try{
@@ -110,7 +110,7 @@ public class SymbolTable {
 	 * @param dec
 	 */
 	private void insertIntoLcTable(String ident, Dec dec){
-		lcTable.put(ident, new SymbolTableObject(0, dec));
+		lcTable.put(ident, new SymbolTableObject(scopeStackStack.peek().getCurrentScope(), dec));
 	}
 	
 	/**
