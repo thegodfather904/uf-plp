@@ -30,8 +30,6 @@ import cop5556sp17.AST.WhileStatement;
 
 import java.util.ArrayList;
 
-import com.sun.xml.internal.ws.policy.sourcemodel.ModelNode.Type; /*TODO*/
-
 import cop5556sp17.Scanner.Kind;
 import cop5556sp17.Scanner.LinePos;
 import cop5556sp17.Scanner.Token;
@@ -62,7 +60,47 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit chain
+		binaryChain.getE0().visit(this, null);
+		
+		//visit chain elem
+		binaryChain.getE1().visit(this, null);
+		
+		//typecheck
+		TypeName e0 = binaryChain.getE0().getTypeName();
+		TypeName e1 = binaryChain.getE1().getTypeName();
+		
+		Token op = binaryChain.getArrow();
+		
+		if(e0.isType(TypeName.URL) && op.isKind(ARROW) && e1.isType(TypeName.IMAGE))
+			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.FILE) && op.isKind(ARROW) && e1.isType(TypeName.IMAGE))
+			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.FRAME) && op.isKind(ARROW) && (binaryChain.getE1() instanceof FrameOpChain 
+				&& (binaryChain.getE1().getFirstToken().isKind(KW_XLOC) || binaryChain.getE1().getFirstToken().isKind(KW_YLOC))))
+			binaryChain.setTypeName(TypeName.INTEGER);
+		else if (e0.isType(TypeName.FRAME) && op.isKind(ARROW) && (binaryChain.getE1() instanceof FrameOpChain 
+				&& (binaryChain.getE1().getFirstToken().isKind(KW_SHOW) || binaryChain.getE1().getFirstToken().isKind(KW_HIDE)
+						|| binaryChain.getE1().getFirstToken().isKind(KW_MOVE))))
+			binaryChain.setTypeName(TypeName.FRAME);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && (binaryChain.getE1() instanceof ImageOpChain && 
+				(binaryChain.getE1().getFirstToken().isKind(OP_WIDTH) || binaryChain.getE1().getFirstToken().isKind(OP_HEIGHT))))
+			binaryChain.setTypeName(TypeName.INTEGER);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && e1.isType(TypeName.FRAME))
+			binaryChain.setTypeName(TypeName.FRAME);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && e1.isType(TypeName.FILE))
+			binaryChain.setTypeName(TypeName.NONE);
+		else if (e0.isType(TypeName.IMAGE) && (op.isKind(ARROW) || op.isKind(BARARROW)) 
+				&& (binaryChain.getE1() instanceof FilterOpChain && (binaryChain.getE1().getFirstToken().isKind(OP_GRAY)
+						|| binaryChain.getE1().getFirstToken().isKind(OP_BLUR) || binaryChain.getE1().getFirstToken().isKind(OP_CONVOLVE))))
+			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && (binaryChain.getE1() instanceof ImageOpChain && 
+				(binaryChain.getE1().getFirstToken().isKind(KW_SCALE))))
+			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && binaryChain.getE1() instanceof IdentChain)
+			binaryChain.setTypeName(TypeName.IMAGE);
+		
 		return null;
 	}
 
@@ -160,19 +198,54 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitFilterOpChain(FilterOpChain filterOpChain, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit the tuple
+		filterOpChain.getArg().visit(this, null);
+		
+		if(filterOpChain.getArg().getExprList().size() == 0)
+			filterOpChain.setTypeName(TypeName.INTEGER);
+		
 		return null;
 	}
 
 	@Override
 	public Object visitFrameOpChain(FrameOpChain frameOpChain, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit the tuples
+		frameOpChain.getArg().visit(this, null);
+		
+		Token frameOpToken = frameOpChain.getFirstToken();
+		
+		//type checking
+		if((frameOpToken.isKind(KW_SHOW) || frameOpToken.isKind(KW_HIDE)) 
+				&& frameOpChain.getArg().getExprList().size() == 0)
+			frameOpChain.setTypeName(TypeName.NONE);
+		else if ((frameOpToken.isKind(KW_XLOC) || frameOpToken.isKind(KW_YLOC)) 
+				&& frameOpChain.getArg().getExprList().size() == 0)
+			frameOpChain.setTypeName(TypeName.INTEGER);
+		else if ((frameOpToken.isKind(KW_MOVE)) 
+				&& frameOpChain.getArg().getExprList().size() == 2)
+			frameOpChain.setTypeName(TypeName.NONE);
+			
+		
 		return null;
 	}
 
 	@Override
 	public Object visitIdentChain(IdentChain identChain, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		String ident = identChain.getFirstToken().getText();
+		
+		Dec dec = symtab.lookup(ident);
+		if(dec == null)
+			throw new TypeCheckException("Ident was never declared");
+		
+		if(!symtab.isIdentVisible(ident))
+			throw new TypeCheckException("Ident was declared but is not visisble in the current block");
+		
+		//set ident chain type to ident type
+		identChain.setTypeName(dec.getTypeName());
+		
 		return null;
 	}
 
@@ -194,7 +267,6 @@ public class TypeCheckVisitor implements ASTVisitor {
 		
 		//Set the ident expression dec to the dec of the ident
 		identExpression.setDec(dec);
-		
 		
 		return null;
 	}
@@ -322,13 +394,28 @@ public class TypeCheckVisitor implements ASTVisitor {
 
 	@Override
 	public Object visitImageOpChain(ImageOpChain imageOpChain, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		//visit the tuple
+		imageOpChain.getArg().visit(this, null);
+		
+		if(imageOpChain.getArg().getExprList().size() == 0 && (imageOpChain.getFirstToken().isKind(OP_WIDTH) 
+				|| imageOpChain.getFirstToken().isKind(OP_WIDTH)))
+			imageOpChain.setTypeName(TypeName.INTEGER);
+		else if(imageOpChain.getArg().getExprList().size() == 1 && imageOpChain.getFirstToken().isKind(KW_SCALE))
+			imageOpChain.setTypeName(TypeName.IMAGE);
+		
 		return null;
 	}
 
 	@Override
 	public Object visitTuple(Tuple tuple, Object arg) throws Exception {
-		// TODO Auto-generated method stub
+		
+		for(Expression e : tuple.getExprList()){
+			e.visit(this, null);
+			if(!e.getTypeName().isType(TypeName.INTEGER))
+				throw new TypeCheckException("Tuple: expression type is : " + e.getTypeName());
+		}
+		
 		return null;
 	}
 

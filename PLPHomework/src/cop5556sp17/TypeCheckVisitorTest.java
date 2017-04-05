@@ -33,8 +33,9 @@ public class TypeCheckVisitorTest {
 
 	@Test 
 	public void myTest() throws Exception {
-		String input = "testProgram {integer x integer y while(x == y){integer testScope x <- 12;} while(x == y){y <- 12;}}";
-//		String input = "testProgram {integer test integer test2 integer test3 test <- test3 == test2;}";
+		String input = "testProgram {image x x -> blur;}";
+//		String ifWhile = "testProgram {integer x integer y while(x == y){integer testScope x <- 12;} while(x == y){y <- 12;}}";
+//		String expression = "testProgram {integer test integer test2 integer test3 test <- test3 == test2;}";
 //		String input = "test url test2, url test3 {test <- 10 + 7;}";
 //		String input = "test url test2, url test3 {if(a < 12){integer test} if(a < 12){integer test}}";
 		Scanner scanner = new Scanner(input);
