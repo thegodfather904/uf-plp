@@ -33,12 +33,13 @@ public class TypeCheckVisitorTest {
 
 	@Test 
 	public void myTest() throws Exception {
+		String testArrowArrow2Error = "p integer a, integer b {image img1 image img2 if(img1 != img2) {image a a <- img1; } if(a != b) {boolean a a <- img1 != img2; }}";
 //		String simpleChain = "testProgram {image x image x x -> blur;}";
-		String ifWhile = "testProgram {integer x integer y while(x == y){integer x integer testScope x <- 12;} while(x == y){y <- 12;}}";
+//		String ifWhile = "testProgram {integer x integer y while(x == y){integer x integer testScope x <- 12;} while(x == y){y <- 12;}}";
 //		String expression = "testProgram {integer test integer test2 integer test3 test <- test3 == test2;}";
 //		String input = "test url test2, url test3 {test <- 10 + 7;}";
 //		String input = "test url test2, url test3 {if(a < 12){integer test} if(a < 12){integer test}}";
-		Scanner scanner = new Scanner(ifWhile);
+		Scanner scanner = new Scanner(testArrowArrow2Error);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		Program program = parser.parse();
