@@ -33,18 +33,27 @@ public class TypeCheckVisitorTest {
 
 	@Test 
 	public void myTest() throws Exception {
-		String testArrowArrow2Error = "p integer a, integer b {image img1 image img2 if(img1 != img2) {image a a <- img1; } if(a != b) {boolean a a <- img1 != img2; }}";
-//		String simpleChain = "testProgram {image x image x x -> blur;}";
+//		String complicatedProgram = "prog1  file file1, integer itx, boolean b1{ integer ii1 boolean bi1 \n image IMAGE1 frame fram1 sleep itx+ii1; while (b1){if(bi1)\n{sleep ii1+itx*2;}}\nfile1->blur |->gray;fram1 ->yloc;\n IMAGE1->blur->scale (ii1+1)|-> gray;\nii1 <- 12345+54321;}";
+		String testImageOp3 = "prog  boolean y , file x {\n integer z \n scale(100) -> width; blur -> y; convolve -> blur -> gray |-> gray -> width;}";
+//		String testScope = "p integer a, integer b {image img1 image img2 if(img1 != img2) {image a a <- img1; } if(a != b) {boolean a a <- img1 != img2; }}";
+//		String simpleChain = "testProgram {image x image x x -> blur;}"; /*THIS SHOULD ERROR*/
 //		String ifWhile = "testProgram {integer x integer y while(x == y){integer x integer testScope x <- 12;} while(x == y){y <- 12;}}";
-//		String expression = "testProgram {integer test integer test2 integer test3 test <- test3 == test2;}";
-//		String input = "test url test2, url test3 {test <- 10 + 7;}";
-//		String input = "test url test2, url test3 {if(a < 12){integer test} if(a < 12){integer test}}";
-		Scanner scanner = new Scanner(testArrowArrow2Error);
+//		String expression = "testProgram {integer test integer test2 integer test3 test <- test3 == test2;}"; /*THIS SHOULD ERROR*/
+//		String input = "test url test2, url test3 {test <- 10 + 7;}"; /*THIS SHOULD ERROR*/
+//		String input = "test url test2, url test3 {integer a if(a < 12){integer test} if(a < 12){integer test}}";
+		Scanner scanner = new Scanner(testImageOp3);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		Program program = parser.parse();
 		TypeCheckVisitor v = new TypeCheckVisitor();
-		program.visit(v, null);	
+		
+		try{
+			program.visit(v, null);
+		}catch(Exception e){
+			System.out.println(e);
+		}
+			
+		System.out.println("DONE");
 	}
 	
 	
