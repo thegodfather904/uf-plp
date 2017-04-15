@@ -205,7 +205,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		filterOpChain.getArg().visit(this, null);
 		
 		if(filterOpChain.getArg().getExprList().size() == 0)
-			filterOpChain.setTypeName(TypeName.INTEGER);
+			filterOpChain.setTypeName(TypeName.IMAGE);
 		
 		return null;
 	}
