@@ -180,7 +180,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitAssignmentStatement(AssignmentStatement assignStatement, Object arg) throws Exception {
 		assignStatement.getE().visit(this, arg);
 		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
-		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getType());
+		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName()); /*I CHANGED THIS*/
 		assignStatement.getVar().visit(this, arg);
 		return null;
 	}

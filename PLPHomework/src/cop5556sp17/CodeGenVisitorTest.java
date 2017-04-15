@@ -44,17 +44,17 @@ public class CodeGenVisitorTest {
 		CodeGenUtils.dumpBytecode(bytecode);
 		
 		//write byte code to file 
-		String name = ((Program) program).getName();
-		String classFileName = "bin/" + name + ".class";
-		OutputStream output = new FileOutputStream(classFileName);
-		output.write(bytecode);
-		output.close();
-		System.out.println("wrote classfile to " + classFileName);
+//		String name = ((Program) program).getName();
+//		String classFileName = "bin/" + name + ".class";
+//		OutputStream output = new FileOutputStream(classFileName);
+//		output.write(bytecode);
+//		output.close();
+//		System.out.println("wrote classfile to " + classFileName);
 		
 		// directly execute bytecode
-		String[] args = new String[0]; //create command line argument array to initialize params, none in this case
-		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
-		instance.run();
+//		String[] args = new String[0]; //create command line argument array to initialize params, none in this case
+//		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
+//		instance.run();
 	}
 
 
