@@ -14,8 +14,8 @@ import cop5556sp17.AST.Type;
 
 public class SymbolTable {
 	
-	private HashMap<String, SymbolTableObject> lcTable = new HashMap<String, SymbolTableObject>();
-	
+	private HashMap<String, Stack<SymbolTableObject>> lcTable = new HashMap<String, Stack<SymbolTableObject>>();
+
 	private Stack<ScopeStack> scopeStackStack = new Stack<ScopeStack>();
 	private HashSet<Integer> usedScopeSet = new HashSet<Integer>();
 	
@@ -35,8 +35,6 @@ public class SymbolTable {
 		
 		//push new stack and scope number onto stack
 		scopeStackStack.push(new ScopeStack(nextScope));
-		
-		
 	}
 	
 	/**
@@ -67,8 +65,15 @@ public class SymbolTable {
 	 * leaves scope
 	 */
 	public void leaveScope(){
+		int currentScopeNumber = scopeStackStack.peek().getCurrentScope();
+		
 		//remove the current scopeStack from the scopeStackStack
 		scopeStackStack.pop();
+		
+		//pop all elements from the lcTable that are from the old scope
+		for(Stack<SymbolTableObject> stack : lcTable.values())
+			if(!stack.isEmpty() && stack.peek().getScopeNumber() == currentScopeNumber)
+				stack.pop();
 	}
 	
 	/*True if insert was successfull, false if duplicate record*/
@@ -77,7 +82,8 @@ public class SymbolTable {
 		boolean success;
 		
 		//check if already in the symbol table at same scope level
-		if(lcTable.containsKey(ident) && lcTable.get(ident).getScopeNumber() == scopeStackStack.peek().getCurrentScope())
+		if(lcTable.containsKey(ident) && !lcTable.get(ident).isEmpty() 
+				&& lcTable.get(ident).peek().getScopeNumber() == scopeStackStack.peek().getCurrentScope())
 			success = false;
 		else{
 			try{
@@ -110,7 +116,15 @@ public class SymbolTable {
 	 * @param dec
 	 */
 	private void insertIntoLcTable(String ident, Dec dec){
-		lcTable.put(ident, new SymbolTableObject(scopeStackStack.peek().getCurrentScope(), dec));
+		
+		Stack<SymbolTableObject> lsTableStack = lcTable.get(ident);
+		
+		if(lsTableStack == null)
+			lsTableStack = new Stack<SymbolTableObject>();
+		
+		lsTableStack.push(new SymbolTableObject(scopeStackStack.peek().getCurrentScope(), dec));
+		
+		lcTable.put(ident, lsTableStack);
 	}
 	
 	/**
@@ -130,9 +144,9 @@ public class SymbolTable {
 	 * @return
 	 */
 	public Dec lookup(String ident){
-		SymbolTableObject sto = lcTable.get(ident);
-		if(sto != null)
-			return sto.getDec();
+		Stack<SymbolTableObject> lcTableIdentStack = lcTable.get(ident);
+		if(lcTableIdentStack != null)
+			return lcTableIdentStack.peek().getDec();
 		else
 			return null;
 	}
@@ -188,21 +202,27 @@ public class SymbolTable {
 		return "";
 	}
 
-
-	public HashMap<String, SymbolTableObject> getLcTable() {
-		return lcTable;
-	}
-
-
-	public void setLcTable(HashMap<String, SymbolTableObject> lcTable) {
-		this.lcTable = lcTable;
-	}
-
 	public Stack<ScopeStack> getScopeStackStack() {
 		return scopeStackStack;
 	}
 
 	public void setScopeStackStack(Stack<ScopeStack> scopeStackStack) {
 		this.scopeStackStack = scopeStackStack;
+	}
+	
+	public HashMap<String, Stack<SymbolTableObject>> getLcTable() {
+		return lcTable;
+	}
+
+	public void setLcTable(HashMap<String, Stack<SymbolTableObject>> lcTable) {
+		this.lcTable = lcTable;
+	}
+
+	public HashSet<Integer> getUsedScopeSet() {
+		return usedScopeSet;
+	}
+
+	public void setUsedScopeSet(HashSet<Integer> usedScopeSet) {
+		this.usedScopeSet = usedScopeSet;
 	}
 }
