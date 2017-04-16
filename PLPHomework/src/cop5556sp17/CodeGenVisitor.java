@@ -81,6 +81,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	int currentAvailableSlot = 0;
 	Label blockStartLabel;
 	Label blockEndLabel;
+	boolean inWhileStatement = false;
 	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
@@ -268,7 +269,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			blockStartLabel = new Label();
 		
 		//visit start label
-		mv.visitLabel(blockStartLabel);
+		if(!inWhileStatement)
+			mv.visitLabel(blockStartLabel);
 		
 		currentAvailableSlot = 1;	//set to 1 to account for 'this'
 		
@@ -281,8 +283,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			statement.visit(this, null);
 		
 		//visit end label
-		blockEndLabel = new Label();
-		mv.visitLabel(blockEndLabel);
+		if(!inWhileStatement){
+			blockEndLabel = new Label();
+			mv.visitLabel(blockEndLabel);
+		}
 		
 		//set blockStart and End labels to null
 		blockStartLabel = null;
@@ -438,7 +442,21 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitWhileStatement(WhileStatement whileStatement, Object arg) throws Exception {
-		//TODO Implement this
+		
+		Label guard = new Label();
+		Label block = new Label();
+		
+		mv.visitLabel(block);
+		whileStatement.getB().visit(this, null);
+		
+		mv.visitLabel(guard);
+		whileStatement.getE().visit(this, null);
+		
+		mv.visitJumpInsn(IFNE, block);
+		
+		Label endWhile = new Label();
+		mv.visitLabel(endWhile);
+		
 		return null;
 	}
 
