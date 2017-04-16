@@ -77,6 +77,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	final boolean DEVEL;
 	final boolean GRADE;
 
+	int currentAvailableSlot = 0;
+	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
 		cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -178,10 +180,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitAssignmentStatement(AssignmentStatement assignStatement, Object arg) throws Exception {
+		
+		//visit expression, prob need to evaluate and then leave on top of stack
 		assignStatement.getE().visit(this, arg);
-		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
-		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName()); /*I CHANGED THIS*/
+		
+		//print whats on top of stack for grading
+//		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
+//		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
+		
+		//visit var, prob need to consume whats on the top of the stack
 		assignStatement.getVar().visit(this, arg);
+		
 		return null;
 	}
 
@@ -199,7 +208,18 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitBlock(Block block, Object arg) throws Exception {
-		//TODO  Implement this
+		
+		currentAvailableSlot = 1;	//set to 1 to account for 'this'
+		
+		//visit decs
+		for(Dec dec : block.getDecs())
+			dec.visit(this, null);
+		
+		//visit statements
+		for(Statement statement : block.getStatements())
+			statement.visit(this, null);
+		
+		
 		return null;
 	}
 
@@ -217,7 +237,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
-		//TODO Implement this
+		
+		//Assign a slot in the local variable array to this variable and save it in the new slot attribute in the  Dec class
+		declaration.setSlotNumber(currentAvailableSlot++);
+		
 		return null;
 	}
 
@@ -273,7 +296,21 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
-		//TODO Implement this
+		if(paramDec.getTypeName().isType(TypeName.INTEGER)){
+			
+			FieldVisitor fv = cw.visitField(ACC_PUBLIC, paramDec.getIdent().getText(), "I", null, null);
+			fv.visitEnd();
+			
+			mv.visitVarInsn(ALOAD, 1); 	//push array
+			mv.visitInsn(ICONST_0); 	//push array index we want
+			mv.visitInsn(AALOAD);		//push object at array index
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false); //convert to int
+			mv.visitVarInsn(ISTORE, 2); //store into slot 2
+
+		}else if (paramDec.getTypeName().isType(TypeName.BOOLEAN)){
+			//TODO Implement this
+		}
+
 		//For assignment 5, only needs to handle integers and booleans
 		return null;
 

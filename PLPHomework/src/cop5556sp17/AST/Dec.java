@@ -7,6 +7,7 @@ public class Dec extends ASTNode {
 	
 	final Token ident;
 	private TypeName typeName;
+	private int slotNumber = -1;
 	
 	public Dec(Token firstToken, Token ident) {
 		super(firstToken);
@@ -70,6 +71,14 @@ public class Dec extends ASTNode {
 
 	public void setTypeName(TypeName typeName) {
 		this.typeName = typeName;
+	}
+
+	public int getSlotNumber() {
+		return slotNumber;
+	}
+
+	public void setSlotNumber(int slotNumber) {
+		this.slotNumber = slotNumber;
 	}
 
 }
