@@ -285,12 +285,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		blockEndLabel = new Label();
 		mv.visitLabel(blockEndLabel);
 		
-		//visit local vars
-//		for(Dec dec : block.getDecs()){
-//			mv.visitLocalVariable(className, dec.getTypeName().getJVMTypeDesc(), null, blockStartLabel, blockEndLabel, dec.getSlotNumber());
-//		}
-			
-		
 		//set blockStart and End labels to null
 		blockStartLabel = null;
 		blockEndLabel = null;
