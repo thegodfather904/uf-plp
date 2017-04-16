@@ -213,18 +213,50 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//do operation and leave on stack
 		if(binaryExpression.getOp().isKind(PLUS))
 			mv.visitInsn(IADD);
-		if(binaryExpression.getOp().isKind(MINUS))
+		else if(binaryExpression.getOp().isKind(MINUS))
 			mv.visitInsn(ISUB);
-		if(binaryExpression.getOp().isKind(OR))
+		else if(binaryExpression.getOp().isKind(OR))
 			mv.visitInsn(IOR);
 		else if (binaryExpression.getOp().isKind(TIMES))
 			mv.visitInsn(IMUL);
 		else if (binaryExpression.getOp().isKind(DIV))
 			mv.visitInsn(IDIV);
-		if(binaryExpression.getOp().isKind(AND))
+		else if(binaryExpression.getOp().isKind(AND))
 			mv.visitInsn(IAND);
-		if(binaryExpression.getOp().isKind(MOD))
+		else if(binaryExpression.getOp().isKind(MOD))
 			mv.visitInsn(IREM);
+		else{
+			
+			Label trueLabel = new Label();
+			Label falseLabel = new Label();
+			Label doneLabel = new Label();
+			
+			if(binaryExpression.getOp().isKind(LT))
+				mv.visitJumpInsn(IF_ICMPGE, falseLabel);
+			else if(binaryExpression.getOp().isKind(LE))
+				mv.visitJumpInsn(IF_ICMPGT, falseLabel);
+			else if (binaryExpression.getOp().isKind(GT))
+				mv.visitJumpInsn(IF_ICMPLE, falseLabel);
+			else if (binaryExpression.getOp().isKind(GE))
+				mv.visitJumpInsn(IF_ICMPLT, falseLabel);
+			else if(binaryExpression.getOp().isKind(EQUAL))
+				mv.visitJumpInsn(IF_ICMPNE, falseLabel);
+			else if(binaryExpression.getOp().isKind(NOTEQUAL))
+				mv.visitJumpInsn(IF_ICMPEQ, falseLabel);
+			
+			//if true
+			mv.visitLabel(trueLabel);
+			mv.visitInsn(ICONST_1);
+			mv.visitJumpInsn(GOTO, doneLabel);
+			
+			//if false
+			mv.visitLabel(falseLabel);
+			mv.visitInsn(ICONST_0);
+			
+			//done label
+			mv.visitLabel(doneLabel);
+			
+		}
 		
 		return null;
 	}
