@@ -25,7 +25,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String input = "emptyProg integer x{integer y boolean test test <- true; while(test){y <- 1; test <- false;} y <- 2;}";	
+		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- y;} y <- 999;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
