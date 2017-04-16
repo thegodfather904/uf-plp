@@ -132,6 +132,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 					case MINUS:
 					case TIMES:
 					case DIV:
+					case MOD:
 						binaryExpression.setTypeName(TypeName.INTEGER);
 						break;
 					case LT:
@@ -162,6 +163,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 					case GT:
 					case LE:
 					case GE:
+					case AND:
+					case OR:
 					binaryExpression.setTypeName(TypeName.BOOLEAN);
 					break;
 				}

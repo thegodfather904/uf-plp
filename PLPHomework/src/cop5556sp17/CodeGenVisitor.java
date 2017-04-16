@@ -175,9 +175,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//generate classfile and return it
 		return cw.toByteArray();
 	}
-
-
-
+	
 	@Override
 	public Object visitAssignmentStatement(AssignmentStatement assignStatement, Object arg) throws Exception {
 		
@@ -185,8 +183,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		assignStatement.getE().visit(this, arg);
 		
 		//print whats on top of stack for grading
-//		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
-//		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
+		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
+		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
 		
 		//visit var, prob need to consume whats on the top of the stack
 		assignStatement.getVar().visit(this, arg);
@@ -202,7 +200,29 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) throws Exception {
-      //TODO  Implement this
+      
+		//visit e0;
+		binaryExpression.getE0().visit(this, null);
+		
+		//visit e1;
+		binaryExpression.getE1().visit(this, null);
+		
+		//do operation and leave on stack
+		if(binaryExpression.getOp().isKind(PLUS))
+			mv.visitInsn(IADD);
+		if(binaryExpression.getOp().isKind(MINUS))
+			mv.visitInsn(ISUB);
+		if(binaryExpression.getOp().isKind(OR))
+			mv.visitInsn(IOR);
+		else if (binaryExpression.getOp().isKind(TIMES))
+			mv.visitInsn(IMUL);
+		else if (binaryExpression.getOp().isKind(DIV))
+			mv.visitInsn(IDIV);
+		if(binaryExpression.getOp().isKind(AND))
+			mv.visitInsn(IAND);
+		if(binaryExpression.getOp().isKind(MOD))
+			mv.visitInsn(IREM);
+		
 		return null;
 	}
 
@@ -219,13 +239,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		for(Statement statement : block.getStatements())
 			statement.visit(this, null);
 		
-		
 		return null;
 	}
 
 	@Override
 	public Object visitBooleanLitExpression(BooleanLitExpression booleanLitExpression, Object arg) throws Exception {
-		//TODO Implement this
+		
+		if(booleanLitExpression.getValue())
+			mv.visitInsn(ICONST_1);
+		else
+			mv.visitInsn(ICONST_0);
+		
 		return null;
 	}
 
@@ -237,10 +261,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitDec(Dec declaration, Object arg) throws Exception {
-		
 		//Assign a slot in the local variable array to this variable and save it in the new slot attribute in the  Dec class
 		declaration.setSlotNumber(currentAvailableSlot++);
-		
 		return null;
 	}
 
@@ -264,13 +286,27 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIdentExpression(IdentExpression identExpression, Object arg) throws Exception {
-		//TODO Implement this
+		
+		//push value of ident onto stack
+		if(identExpression.getDec().getSlotNumber() == -1){
+			//FIX THIS STUPID ASS SHIT
+			mv.visitFieldInsn(GETFIELD, className, identExpression.getDec().getIdent().getText(), "I"); //TODO check for bool or int
+		}
+		else
+			mv.visitVarInsn(ILOAD, identExpression.getDec().getSlotNumber());
+		
 		return null;
 	}
 
 	@Override
 	public Object visitIdentLValue(IdentLValue identX, Object arg) throws Exception {
-		//TODO Implement this
+		//store value on top of stack into this variable
+		//if sn == -1, its a field of the class, if any other sn its a local var
+		if(identX.getDec().getSlotNumber() == -1){
+			//TODO FIX THIS FUCKING STUPID ASS SHIT
+		}else
+			mv.visitVarInsn(ISTORE, identX.getDec().getSlotNumber());
+		
 		return null;
 
 	}
@@ -289,7 +325,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIntLitExpression(IntLitExpression intLitExpression, Object arg) throws Exception {
-		//TODO Implement this
+		//load constant onto stack
+		mv.visitLdcInsn(intLitExpression.value);
 		return null;
 	}
 
@@ -298,15 +335,21 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
 		if(paramDec.getTypeName().isType(TypeName.INTEGER)){
 			
-			FieldVisitor fv = cw.visitField(ACC_PUBLIC, paramDec.getIdent().getText(), "I", null, null);
+			//TODO FIX THIS FUCKING SHIT
+			
+			FieldVisitor fv = cw.visitField(0, paramDec.getIdent().getText(), "I", null, null);
 			fv.visitEnd();
 			
-			mv.visitVarInsn(ALOAD, 1); 	//push array
-			mv.visitInsn(ICONST_0); 	//push array index we want
-			mv.visitInsn(AALOAD);		//push object at array index
-			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false); //convert to int
-			mv.visitVarInsn(ISTORE, 2); //store into slot 2
-
+			mv.visitVarInsn(ALOAD, 0);
+			mv.visitVarInsn(ALOAD, 1);
+			mv.visitInsn(ICONST_0);
+			mv.visitInsn(AALOAD);
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
+			
+//			CodeGenUtils.genPrintTOS(GRADE, mv, paramDec.getTypeName());
+			
+//			mv.visitFieldInsn(PUTFIELD, className, paramDec.getIdent().getText(), "I");
+			
 		}else if (paramDec.getTypeName().isType(TypeName.BOOLEAN)){
 			//TODO Implement this
 		}

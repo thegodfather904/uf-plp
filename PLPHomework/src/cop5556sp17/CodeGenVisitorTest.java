@@ -25,7 +25,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String input = "emptyProg integer x{integer y y <- x;}";		
+		String input = "emptyProg integer x{boolean y  y <- true & true;}";	
 		Scanner scanner = new Scanner(input);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
