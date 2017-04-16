@@ -78,7 +78,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	final boolean GRADE;
 	
 	//ADDED BY ME
-	int currentAvailableSlot = 0;
+	int currentAvailableSlot = 1;
 	Label blockStartLabel;
 	Label blockEndLabel;
 	boolean inWhileStatement = false;
@@ -269,10 +269,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			blockStartLabel = new Label();
 		
 		//visit start label
-		if(!inWhileStatement)
-			mv.visitLabel(blockStartLabel);
+		mv.visitLabel(blockStartLabel);
 		
-		currentAvailableSlot = 1;	//set to 1 to account for 'this'
+//		currentAvailableSlot = 1;	//set to 1 to account for 'this'
 		
 		//visit decs
 		for(Dec dec : block.getDecs())
@@ -283,10 +282,14 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			statement.visit(this, null);
 		
 		//visit end label
-		if(!inWhileStatement){
-			blockEndLabel = new Label();
-			mv.visitLabel(blockEndLabel);
-		}
+		blockEndLabel = new Label();
+		mv.visitLabel(blockEndLabel);
+		
+		//visit local vars
+//		for(Dec dec : block.getDecs()){
+//			mv.visitLocalVariable(className, dec.getTypeName().getJVMTypeDesc(), null, blockStartLabel, blockEndLabel, dec.getSlotNumber());
+//		}
+			
 		
 		//set blockStart and End labels to null
 		blockStartLabel = null;
@@ -446,7 +449,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		Label guard = new Label();
 		Label block = new Label();
 		
-		mv.visitLabel(block);
+		blockStartLabel = block;
 		whileStatement.getB().visit(this, null);
 		
 		mv.visitLabel(guard);

@@ -25,9 +25,10 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- y;} y <- 999;}";	
+		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
+//		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
-		Scanner scanner = new Scanner(input);
+		Scanner scanner = new Scanner(scoping);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		ASTNode program = parser.parse();
