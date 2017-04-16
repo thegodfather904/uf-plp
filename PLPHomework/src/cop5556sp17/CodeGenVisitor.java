@@ -76,8 +76,11 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	/** Indicates whether genPrint and genPrintTOS should generate code. */
 	final boolean DEVEL;
 	final boolean GRADE;
-
+	
+	//ADDED BY ME
 	int currentAvailableSlot = 0;
+	Label blockStartLabel;
+	Label blockEndLabel;
 	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
@@ -229,6 +232,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	@Override
 	public Object visitBlock(Block block, Object arg) throws Exception {
 		
+		if(blockStartLabel == null)
+			blockStartLabel = new Label();
+		
+		//visit start label
+		mv.visitLabel(blockStartLabel);
+		
 		currentAvailableSlot = 1;	//set to 1 to account for 'this'
 		
 		//visit decs
@@ -239,17 +248,23 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		for(Statement statement : block.getStatements())
 			statement.visit(this, null);
 		
+		//visit end label
+		blockEndLabel = new Label();
+		mv.visitLabel(blockEndLabel);
+		
+		//set blockStart and End labels to null
+		blockStartLabel = null;
+		blockEndLabel = null;
+		
 		return null;
 	}
 
 	@Override
 	public Object visitBooleanLitExpression(BooleanLitExpression booleanLitExpression, Object arg) throws Exception {
-		
 		if(booleanLitExpression.getValue())
 			mv.visitInsn(ICONST_1);
 		else
 			mv.visitInsn(ICONST_0);
-		
 		return null;
 	}
 
@@ -313,7 +328,25 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIfStatement(IfStatement ifStatement, Object arg) throws Exception {
-		//TODO Implement this
+		
+		
+		Label skipBlock = new Label();
+		Label doBlock = new Label();
+		
+		//visit expression
+		ifStatement.getE().visit(this, null);
+		
+		//do the if statement
+		mv.visitJumpInsn(IFEQ, skipBlock);
+		
+		//visit the block
+		//set blockStart to doBlock
+		blockStartLabel = doBlock;
+		ifStatement.getB().visit(this, null);
+		
+		//visit the skipBlock label
+		mv.visitLabel(skipBlock);
+		
 		return null;
 	}
 
