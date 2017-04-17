@@ -341,7 +341,22 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitFrameOpChain(FrameOpChain frameOpChain, Object arg) throws Exception {
-		//TODO
+		
+		//visit tuple
+		frameOpChain.getArg().visit(this, null);
+		
+		if(frameOpChain.getFirstToken().isKind(KW_SHOW)){
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "showImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
+		}else if(frameOpChain.getFirstToken().isKind(KW_HIDE)){
+			//TODO
+		}else if(frameOpChain.getFirstToken().isKind(KW_MOVE)){
+			//TODO
+		}else if(frameOpChain.getFirstToken().isKind(KW_XLOC)){
+			//TODO
+		}else if(frameOpChain.getFirstToken().isKind(KW_YLOC)){
+			//TODO
+		}
+		
 		return null;
 	}
 
@@ -533,7 +548,11 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitTuple(Tuple tuple, Object arg) throws Exception {
-		//TODO
+		
+		//visit the expressions
+		for(Expression e : tuple.getExprList())
+			e.visit(this, null);
+		
 		return null;
 	}
 

@@ -29,7 +29,7 @@ public class CodeGenVisitorTest {
 	@Test
 	public void myTests() throws Exception {
 //		String fileAndUrlImage = "tp url u, file fn{integer x integer y x <- 7;  x -> y; integer test test <- y;}";
-		String fileAndUrlImage = "tp url u, file fn{frame fr image i u -> i -> fr;}";
+		String fileAndUrlImage = "tp url u, file fn{frame fr image i u -> i -> fr -> show;}";
 //		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
