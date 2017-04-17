@@ -28,13 +28,15 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-//		String fileAndUrlImage = "tp url u, file fn{integer x integer y x <- 7;  x -> y; integer test test <- y;}";
-		String fileAndUrlImage = "tp url u, file fn{frame fr image i integer x u -> i -> fr -> show -> move(1,2) -> yloc -> x;  integer y y <- x;}";
+		String filterOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> blur -> fr -> show;}";
+		
+//		String integerChain = "tp url u, file fn{integer x integer y x <- 7;  x -> y; integer test test <- y;}";
+//		String frameOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> fr -> show -> move(1,2) -> yloc -> x;  integer y y <- x;}";
 //		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
-		Scanner scanner = new Scanner(fileAndUrlImage);
+		Scanner scanner = new Scanner(filterOpChain);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		ASTNode program = parser.parse();

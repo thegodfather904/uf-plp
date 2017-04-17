@@ -176,7 +176,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		mv.visitMaxs(1, 1);
 		mv.visitEnd(); // end of run method
 		
-		
 		cw.visitEnd();//end of class
 		
 		//generate classfile and return it
@@ -335,7 +334,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitFilterOpChain(FilterOpChain filterOpChain, Object arg) throws Exception {
-		//TODO
+		
+		//visit tuple
+		filterOpChain.getArg().visit(this, null);
+		
+		if(filterOpChain.getFirstToken().isKind(OP_BLUR)){
+			mv.visitInsn(ACONST_NULL);
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFilterOps", "blurOp", "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+		}
+		else if(filterOpChain.getFirstToken().isKind(OP_GRAY))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "hideImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
+		else if(filterOpChain.getFirstToken().isKind(OP_CONVOLVE))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "moveFrame", "(II)Lcop5556sp17/PLPRuntimeFrame;", false);
+		
 		return null;
 	}
 
