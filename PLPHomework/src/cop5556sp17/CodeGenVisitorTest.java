@@ -3,6 +3,9 @@ package cop5556sp17;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -92,4 +95,14 @@ public class CodeGenVisitorTest {
 	}
 
 
+	@Before
+	public void initLog(){
+		if (devel || grade) PLPRuntimeLog.initLog();
+	}
+	
+	@After
+	public void printLog(){
+		System.out.println(PLPRuntimeLog.getString());
+	}
+	
 }
