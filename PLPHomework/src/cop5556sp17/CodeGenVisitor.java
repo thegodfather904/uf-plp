@@ -348,7 +348,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		if(frameOpChain.getFirstToken().isKind(KW_SHOW)){
 			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "showImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
 		}else if(frameOpChain.getFirstToken().isKind(KW_HIDE)){
-			//TODO
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "hideImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
 		}else if(frameOpChain.getFirstToken().isKind(KW_MOVE)){
 			//TODO
 		}else if(frameOpChain.getFirstToken().isKind(KW_XLOC)){
