@@ -28,11 +28,12 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
+		String sleep = "tp {integer x sleep(5000); x <- 10;}";
+//		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
-		Scanner scanner = new Scanner(paramDecTest);
+		Scanner scanner = new Scanner(sleep);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		ASTNode program = parser.parse();

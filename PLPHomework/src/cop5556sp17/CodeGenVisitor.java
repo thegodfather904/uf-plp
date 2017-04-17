@@ -420,7 +420,16 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitSleepStatement(SleepStatement sleepStatement, Object arg) throws Exception {
-		assert false : "not yet implemented";
+		
+		//visit expression
+		sleepStatement.getE().visit(this, null);
+		
+		//convert to long
+		mv.visitInsn(I2L);
+		
+		//call thread.sleep
+		mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "sleep", "(J)V", false);
+		
 		return null;
 	}
 
