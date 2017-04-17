@@ -443,7 +443,18 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	}
 	
 	private void urlParamDec(ParamDec paramDec){
+		//instaniate new PLPRuntimeImageIO object and save in slot 2
+		mv.visitTypeInsn(NEW, "cop5556sp17/PLPRuntimeImageIO");
+		mv.visitInsn(DUP);
+		mv.visitMethodInsn(INVOKESPECIAL, "cop5556sp17/PLPRuntimeImageIO", "<init>", "()V", false);
+		mv.visitVarInsn(ASTORE, 2);
 		
+		//load arg array then current index
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitLdcInsn(argArrayIndex++);
+		
+		//run the method to get the url
+		mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "getURL", "([Ljava/lang/String;I)Ljava/net/URL;", false);
 	}
 	
 	@Override
