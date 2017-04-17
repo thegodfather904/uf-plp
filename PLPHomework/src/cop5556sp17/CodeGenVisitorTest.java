@@ -28,7 +28,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String sleep = "tp {integer x sleep(5000); x <- 10;}";
+		String sleep = "tp integer x, boolean y{integer i i <- x; boolean b b <- y;}";
 //		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
@@ -56,7 +56,7 @@ public class CodeGenVisitorTest {
 		System.out.println("wrote classfile to " + classFileName);
 		
 		// directly execute bytecode
-		String[] args = new String[] {"true", "1"} ;
+		String[] args = new String[] {"99", "true"} ;
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
 	}

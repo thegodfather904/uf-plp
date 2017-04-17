@@ -1,14 +1,13 @@
 package cop5556sp17;
 
+import java.io.File;
+import java.net.URL;
+
 public class Test {
 	
-	
-	
 	public Test(String[] args) throws Exception{
-		
-		int test = 0;
-		long l = (long) test;
-		Thread.sleep(l);
+		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
+		URL test = imageIO.getURL(args, 1);
 	}
 
 }

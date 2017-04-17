@@ -400,24 +400,52 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
 		FieldVisitor fv = cw.visitField(ACC_STATIC, paramDec.getIdent().getText(), paramDec.getTypeName().getJVMTypeDesc(), null, null);
 		fv.visitEnd();
+
+		if(paramDec.getTypeName().isType(TypeName.INTEGER))
+			intParamDec(paramDec);
+		else if (paramDec.getTypeName().isType(TypeName.BOOLEAN))
+			boolParamDec(paramDec);
+		else if (paramDec.getTypeName().isType(TypeName.FILE))
+			fileParamDec(paramDec);
+		else if (paramDec.getTypeName().isType(TypeName.URL))
+			urlParamDec(paramDec);
 		
+		mv.visitFieldInsn(PUTSTATIC, className, paramDec.getIdent().getText(), paramDec.getTypeName().getJVMTypeDesc());
+		
+		return null;
+
+	}
+	
+	private void intParamDec(ParamDec paramDec){
 		mv.visitVarInsn(ALOAD, 0);
 		mv.visitVarInsn(ALOAD, 1);
 		mv.visitLdcInsn(argArrayIndex++);
 		mv.visitInsn(AALOAD);
-		
-		if(paramDec.getTypeName().isType(TypeName.INTEGER))
-			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
-		else if (paramDec.getTypeName().isType(TypeName.BOOLEAN))
-			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "parseBoolean", "(Ljava/lang/String;)Z", false);
-
-		mv.visitFieldInsn(PUTSTATIC, className, paramDec.getIdent().getText(), paramDec.getTypeName().getJVMTypeDesc());
-		
-		//For assignment 5, only needs to handle integers and booleans
-		return null;
-
+		mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
 	}
-
+	
+	private void boolParamDec(ParamDec paramDec){
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitLdcInsn(argArrayIndex++);
+		mv.visitInsn(AALOAD);
+		mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "parseBoolean", "(Ljava/lang/String;)Z", false);;
+	}
+	
+	private void fileParamDec(ParamDec paramDec){
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitTypeInsn(NEW, "java/io/File");
+		mv.visitInsn(DUP);
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitLdcInsn(argArrayIndex++);
+		mv.visitInsn(AALOAD);
+		mv.visitMethodInsn(INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false);
+	}
+	
+	private void urlParamDec(ParamDec paramDec){
+		
+	}
+	
 	@Override
 	public Object visitSleepStatement(SleepStatement sleepStatement, Object arg) throws Exception {
 		
