@@ -81,7 +81,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	int currentAvailableSlot = 1;
 	Label blockStartLabel;
 	Label blockEndLabel;
-	boolean inWhileStatement = false;
+	
+	int argArrayIndex = 0;
 	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
@@ -169,7 +170,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		Label endRun = new Label();
 		mv.visitLabel(endRun);
 		mv.visitLocalVariable("this", classDesc, null, startRun, endRun, 0);
-//TODO  visit the local variables
+		//TODO  visit the local variables
 		mv.visitMaxs(1, 1);
 		mv.visitEnd(); // end of run method
 		
@@ -337,7 +338,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//push value of ident onto stack
 		if(identExpression.getDec().getSlotNumber() == -1)
 			mv.visitFieldInsn(GETSTATIC, className, identExpression.getDec().getIdent().getText(), 
-					identExpression.getDec().getTypeName().getJVMTypeDesc()); //TODO check for bool or int
+					identExpression.getDec().getTypeName().getJVMTypeDesc());
 		else
 			mv.visitVarInsn(ILOAD, identExpression.getDec().getSlotNumber());
 		
@@ -397,22 +398,21 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
-		if(paramDec.getTypeName().isType(TypeName.INTEGER)){
-			
-			FieldVisitor fv = cw.visitField(ACC_STATIC, paramDec.getIdent().getText(), "I", null, null);
-			fv.visitEnd();
-			
-			mv.visitVarInsn(ALOAD, 0);
-			mv.visitVarInsn(ALOAD, 1);
-			mv.visitInsn(ICONST_0);
-			mv.visitInsn(AALOAD);
+		FieldVisitor fv = cw.visitField(ACC_STATIC, paramDec.getIdent().getText(), paramDec.getTypeName().getJVMTypeDesc(), null, null);
+		fv.visitEnd();
+		
+		mv.visitVarInsn(ALOAD, 0);
+		mv.visitVarInsn(ALOAD, 1);
+		mv.visitLdcInsn(argArrayIndex++);
+		mv.visitInsn(AALOAD);
+		
+		if(paramDec.getTypeName().isType(TypeName.INTEGER))
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
-			mv.visitFieldInsn(PUTSTATIC, className, paramDec.getIdent().getText(), "I");
-			
-		}else if (paramDec.getTypeName().isType(TypeName.BOOLEAN)){
-			//TODO Implement this
-		}
+		else if (paramDec.getTypeName().isType(TypeName.BOOLEAN))
+			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean", "parseBoolean", "(Ljava/lang/String;)Z", false);
 
+		mv.visitFieldInsn(PUTSTATIC, className, paramDec.getIdent().getText(), paramDec.getTypeName().getJVMTypeDesc());
+		
 		//For assignment 5, only needs to handle integers and booleans
 		return null;
 
