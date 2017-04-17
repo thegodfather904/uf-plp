@@ -100,6 +100,10 @@ public class TypeCheckVisitor implements ASTVisitor {
 			binaryChain.setTypeName(TypeName.IMAGE);
 		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && binaryChain.getE1() instanceof IdentChain)
 			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.IMAGE) && op.isKind(ARROW) && (binaryChain.getE1() instanceof IdentChain && e1.isType(TypeName.IMAGE)))
+			binaryChain.setTypeName(TypeName.IMAGE);
+		else if (e0.isType(TypeName.INTEGER) && op.isKind(ARROW) && (binaryChain.getE1() instanceof IdentChain && e1.isType(TypeName.INTEGER)))
+			binaryChain.setTypeName(TypeName.INTEGER);
 		else
 			throw new TypeCheckException("Chain: " + e0 + " OP: " + op.kind + " ChainElem: " + e1 + "/nThis is not a legal combination");
 		

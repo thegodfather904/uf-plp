@@ -6,8 +6,7 @@ import java.net.URL;
 public class Test {
 	
 	public Test(String[] args) throws Exception{
-		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
-		URL test = imageIO.getURL(args, 1);
+		PLPRuntimeFrame frame;
 	}
 
 }
