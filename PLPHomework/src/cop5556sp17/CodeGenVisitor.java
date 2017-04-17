@@ -202,6 +202,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	@Override
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
 		
+		//visiting a binary chain, pop end of statement if needed
+		isBinaryChainVisit = true;
+		
 		//visit left chain
 		isLeftChain = true;
 		binaryChain.getE0().visit(this, null);
@@ -295,10 +298,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 				mv.visitInsn(POP);
 				isBinaryChainVisit = false;
 			}
-				
 		}
 			
-		
 		//visit end label
 		blockEndLabel = new Label();
 		mv.visitLabel(blockEndLabel);
@@ -354,7 +355,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 						"(Ljava/net/URL;)Ljava/awt/image/BufferedImage;", false);
 			}else if (identChain.getTypeName().isType(TypeName.FILE)){
 				mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/io/File;");
-				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", "(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", 
+						"(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
 			}else{
 				if(identChain.getDec().getType().isKind(KW_INTEGER) || identChain.getDec().getType().isKind(KW_BOOLEAN))
 					mv.visitVarInsn(ILOAD, identChain.getDec().getSlotNumber());
@@ -365,13 +367,24 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			}
 		}else{
 			if(identChain.getDec().getType().isKind(KW_INTEGER)){
+				mv.visitInsn(DUP);
 				mv.visitVarInsn(ISTORE, identChain.getDec().getSlotNumber());
 			}else if(identChain.getDec().getType().isKind(KW_IMAGE)){
-				//TODO
+				mv.visitInsn(DUP);
+				mv.visitVarInsn(ASTORE, identChain.getDec().getSlotNumber());
 			}else if (identChain.getDec().getType().isKind(KW_FILE)){
 				//TODO
 			}else if (identChain.getDec().getType().isKind(KW_FRAME)){
-				//TODO
+				//image is already on top of stack, load null as second param
+				mv.visitInsn(ACONST_NULL);
+				
+				//call createOrSetFrame()
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFrame", "createOrSetFrame", 
+						"(Ljava/awt/image/BufferedImage;Lcop5556sp17/PLPRuntimeFrame;)Lcop5556sp17/PLPRuntimeFrame;", false);
+				
+				mv.visitInsn(DUP);
+				mv.visitVarInsn(ASTORE, identChain.getDec().getSlotNumber());
+				
 			}else
 				throw new Exception(); //TODO can it be another type?
 		}

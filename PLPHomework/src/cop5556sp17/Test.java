@@ -1,5 +1,6 @@
 package cop5556sp17;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URL;
 
@@ -10,13 +11,9 @@ public class Test {
 	
 	public Test(String[] args) throws Exception{
 		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
-//		test = imageIO.getURL(args, 1);
-//		imageIO.readFromURL(test);
-		
-		imageIO.readFromFile(fn);
-		
-		int x = 7;
-		int y = x;
+		test = imageIO.getURL(args, 1);
+		BufferedImage img = imageIO.readFromURL(test);
+		PLPRuntimeFrame.createOrSetFrame(img, null);
 		
 		
 	}
