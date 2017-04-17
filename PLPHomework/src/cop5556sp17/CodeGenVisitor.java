@@ -345,17 +345,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//visit tuple
 		frameOpChain.getArg().visit(this, null);
 		
-		if(frameOpChain.getFirstToken().isKind(KW_SHOW)){
+		if(frameOpChain.getFirstToken().isKind(KW_SHOW))
 			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "showImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
-		}else if(frameOpChain.getFirstToken().isKind(KW_HIDE)){
+		else if(frameOpChain.getFirstToken().isKind(KW_HIDE))
 			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "hideImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
-		}else if(frameOpChain.getFirstToken().isKind(KW_MOVE)){
+		else if(frameOpChain.getFirstToken().isKind(KW_MOVE))
 			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "moveFrame", "(II)Lcop5556sp17/PLPRuntimeFrame;", false);
-		}else if(frameOpChain.getFirstToken().isKind(KW_XLOC)){
-			//TODO
-		}else if(frameOpChain.getFirstToken().isKind(KW_YLOC)){
-			//TODO
-		}
+		else if(frameOpChain.getFirstToken().isKind(KW_XLOC))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "getXVal", "()I", false);
+		else if(frameOpChain.getFirstToken().isKind(KW_YLOC))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "getYVal", "()I", false);
+		
 		
 		return null;
 	}
