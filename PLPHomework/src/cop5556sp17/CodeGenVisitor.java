@@ -92,7 +92,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		cw.visit(52, ACC_PUBLIC + ACC_SUPER, className, null, "java/lang/Object",
 				new String[] { "java/lang/Runnable" });
 		cw.visitSource(sourceFileName, null);
-
+		
 		// generate constructor code
 		// get a MethodVisitor
 		mv = cw.visitMethod(ACC_PUBLIC, "<init>", "([Ljava/lang/String;)V", null,
@@ -334,12 +334,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIdentExpression(IdentExpression identExpression, Object arg) throws Exception {
-		
 		//push value of ident onto stack
-		if(identExpression.getDec().getSlotNumber() == -1){
-			//FIX THIS STUPID ASS SHIT
-			mv.visitFieldInsn(GETFIELD, className, identExpression.getDec().getIdent().getText(), "I"); //TODO check for bool or int
-		}
+		if(identExpression.getDec().getSlotNumber() == -1)
+			mv.visitFieldInsn(GETSTATIC, className, identExpression.getDec().getIdent().getText(), 
+					identExpression.getDec().getTypeName().getJVMTypeDesc()); //TODO check for bool or int
 		else
 			mv.visitVarInsn(ILOAD, identExpression.getDec().getSlotNumber());
 		
@@ -351,7 +349,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//store value on top of stack into this variable
 		//if sn == -1, its a field of the class, if any other sn its a local var
 		if(identX.getDec().getSlotNumber() == -1){
-			//TODO FIX THIS FUCKING STUPID ASS SHIT
+			mv.visitFieldInsn(PUTSTATIC, className, identX.getText(), identX.getDec().getTypeName().getJVMTypeDesc());
 		}else
 			mv.visitVarInsn(ISTORE, identX.getDec().getSlotNumber());
 		
@@ -401,9 +399,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitParamDec(ParamDec paramDec, Object arg) throws Exception {
 		if(paramDec.getTypeName().isType(TypeName.INTEGER)){
 			
-			//TODO FIX THIS FUCKING SHIT
-			
-			FieldVisitor fv = cw.visitField(0, paramDec.getIdent().getText(), "I", null, null);
+			FieldVisitor fv = cw.visitField(ACC_STATIC, paramDec.getIdent().getText(), "I", null, null);
 			fv.visitEnd();
 			
 			mv.visitVarInsn(ALOAD, 0);
@@ -411,10 +407,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			mv.visitInsn(ICONST_0);
 			mv.visitInsn(AALOAD);
 			mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "parseInt", "(Ljava/lang/String;)I", false);
-			
-//			CodeGenUtils.genPrintTOS(GRADE, mv, paramDec.getTypeName());
-			
-//			mv.visitFieldInsn(PUTFIELD, className, paramDec.getIdent().getText(), "I");
+			mv.visitFieldInsn(PUTSTATIC, className, paramDec.getIdent().getText(), "I");
 			
 		}else if (paramDec.getTypeName().isType(TypeName.BOOLEAN)){
 			//TODO Implement this

@@ -2,14 +2,10 @@ package cop5556sp17;
 
 public class Test {
 	
+	int arg0;
+	
 	public Test(String[] args){
-		
-		boolean test = true;
-		
-		while(test){
-			test = false;
-		}
-		
+		arg0 = Integer.parseInt(args[0]);
 	}
 
 }
