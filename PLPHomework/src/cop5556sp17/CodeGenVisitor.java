@@ -84,6 +84,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	
 	int argArrayIndex = 0;
 	boolean isLeftChain = false;
+	boolean isBinaryChainVisit = false;
 	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
@@ -286,8 +287,17 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			dec.visit(this, null);
 		
 		//visit statements
-		for(Statement statement : block.getStatements())
+		for(Statement statement : block.getStatements()){
 			statement.visit(this, null);
+			
+			//if binary chain, pop what may be left on the stack
+			if(isBinaryChainVisit){
+				mv.visitInsn(POP);
+				isBinaryChainVisit = false;
+			}
+				
+		}
+			
 		
 		//visit end label
 		blockEndLabel = new Label();
@@ -342,16 +352,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 				mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/net/URL;");
 				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromURL", 
 						"(Ljava/net/URL;)Ljava/awt/image/BufferedImage;", false);
-				
-				//TODO pop for now so it will run
-				mv.visitInsn(POP);
-				
 			}else if (identChain.getTypeName().isType(TypeName.FILE)){
 				mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/io/File;");
 				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", "(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
-				
-				//TODO pop for now so it will run
-				mv.visitInsn(POP);
 			}else{
 				if(identChain.getDec().getType().isKind(KW_INTEGER) || identChain.getDec().getType().isKind(KW_BOOLEAN))
 					mv.visitVarInsn(ILOAD, identChain.getDec().getSlotNumber());
