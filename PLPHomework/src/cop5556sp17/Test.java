@@ -15,6 +15,9 @@ public class Test {
 		
 		imageIO.readFromFile(fn);
 		
+		int x = 7;
+		int y = x;
+		
 		
 	}
 

@@ -83,6 +83,7 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	Label blockEndLabel;
 	
 	int argArrayIndex = 0;
+	boolean isLeftChain = false;
 	
 	@Override
 	public Object visitProgram(Program program, Object arg) throws Exception {
@@ -201,12 +202,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
 		
 		//visit left chain
+		isLeftChain = true;
 		binaryChain.getE0().visit(this, null);
 		
 		//visit right chain
-		
-		
-		//TODO
+		isLeftChain = false;
+		binaryChain.getE1().visit(this, null);
+
 		return null;
 	}
 
@@ -279,8 +281,6 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//visit start label
 		mv.visitLabel(blockStartLabel);
 		
-//		currentAvailableSlot = 1;	//set to 1 to account for 'this'
-		
 		//visit decs
 		for(Dec dec : block.getDecs())
 			dec.visit(this, null);
@@ -337,23 +337,43 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 	@Override
 	public Object visitIdentChain(IdentChain identChain, Object arg) throws Exception {
 		
-		if(identChain.getTypeName().isType(TypeName.URL)){
-			mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/net/URL;");
-			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromURL", 
-					"(Ljava/net/URL;)Ljava/awt/image/BufferedImage;", false);
-			
-			//TODO pop for now so it will run
-			mv.visitInsn(POP);
-			
-		}else if (identChain.getTypeName().isType(TypeName.FILE)){
-			mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/io/File;");
-			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", "(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
-			
-			//TODO pop for now so it will run
-			mv.visitInsn(POP);
+		if(isLeftChain){
+			if(identChain.getTypeName().isType(TypeName.URL)){
+				mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/net/URL;");
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromURL", 
+						"(Ljava/net/URL;)Ljava/awt/image/BufferedImage;", false);
+				
+				//TODO pop for now so it will run
+				mv.visitInsn(POP);
+				
+			}else if (identChain.getTypeName().isType(TypeName.FILE)){
+				mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/io/File;");
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", "(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
+				
+				//TODO pop for now so it will run
+				mv.visitInsn(POP);
+			}else{
+				if(identChain.getDec().getType().isKind(KW_INTEGER) || identChain.getDec().getType().isKind(KW_BOOLEAN))
+					mv.visitVarInsn(ILOAD, identChain.getDec().getSlotNumber());
+				else{
+					mv.visitVarInsn(ALOAD, identChain.getDec().getSlotNumber());
+					throw new Exception(); //TODO can it be another type?
+				}
+			}
 		}else{
-			//TODO
+			if(identChain.getDec().getType().isKind(KW_INTEGER)){
+				mv.visitVarInsn(ISTORE, identChain.getDec().getSlotNumber());
+			}else if(identChain.getDec().getType().isKind(KW_IMAGE)){
+				//TODO
+			}else if (identChain.getDec().getType().isKind(KW_FILE)){
+				//TODO
+			}else if (identChain.getDec().getType().isKind(KW_FRAME)){
+				//TODO
+			}else
+				throw new Exception(); //TODO can it be another type?
 		}
+		
+		
 		
 		return null;
 	}

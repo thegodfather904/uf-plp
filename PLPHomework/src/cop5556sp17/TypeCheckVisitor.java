@@ -254,6 +254,7 @@ public class TypeCheckVisitor implements ASTVisitor {
 		
 		//set ident chain type to ident type
 		identChain.setTypeName(dec.getTypeName());
+		identChain.setDec(dec);
 		
 		return null;
 	}
