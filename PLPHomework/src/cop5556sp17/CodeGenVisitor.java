@@ -340,13 +340,18 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		
 		if(filterOpChain.getFirstToken().isKind(OP_BLUR)){
 			mv.visitInsn(ACONST_NULL);
-			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFilterOps", "blurOp", "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFilterOps", "blurOp", 
+					"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
 		}
-		else if(filterOpChain.getFirstToken().isKind(OP_GRAY))
-			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "hideImage", "()Lcop5556sp17/PLPRuntimeFrame;", false);
-		else if(filterOpChain.getFirstToken().isKind(OP_CONVOLVE))
-			mv.visitMethodInsn(INVOKEVIRTUAL, "cop5556sp17/PLPRuntimeFrame", "moveFrame", "(II)Lcop5556sp17/PLPRuntimeFrame;", false);
-		
+		else if(filterOpChain.getFirstToken().isKind(OP_GRAY)){
+			mv.visitInsn(ACONST_NULL);
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFilterOps", "grayOp", 
+					"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+
+		}
+		else if(filterOpChain.getFirstToken().isKind(OP_CONVOLVE)){
+			
+		}
 		return null;
 	}
 

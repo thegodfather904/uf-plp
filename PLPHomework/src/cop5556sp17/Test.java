@@ -13,7 +13,7 @@ public class Test {
 		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
 		test = imageIO.getURL(args, 1);
 		BufferedImage img = imageIO.readFromURL(test);
-		PLPRuntimeFilterOps.blurOp(img, null);
+		PLPRuntimeFilterOps.grayOp(img, null);
 		
 		
 //		PLPRuntimeFrame.createOrSetFrame(img, null).showImage().moveFrame(1, 2).getYVal();
