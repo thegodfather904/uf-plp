@@ -28,7 +28,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String sleep = "tp url u{frame f image i u -> i;}";
+		String sleep = "tp url u, file fn{frame fr image i fn -> i;}";
 //		String paramDecTest = "emptyProg boolean x, integer z{boolean bool bool <- false; x <- bool;}";
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
@@ -56,7 +56,8 @@ public class CodeGenVisitorTest {
 		System.out.println("wrote classfile to " + classFileName);
 		
 		// directly execute bytecode
-		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png"} ;
+		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
+				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/large.png"} ;
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
 		System.out.println("END!");

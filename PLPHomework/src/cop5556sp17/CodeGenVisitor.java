@@ -199,6 +199,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitBinaryChain(BinaryChain binaryChain, Object arg) throws Exception {
+		
+		//visit left chain
+		binaryChain.getE0().visit(this, null);
+		
+		//visit right chain
+		
+		
 		//TODO
 		return null;
 	}
@@ -329,7 +336,25 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitIdentChain(IdentChain identChain, Object arg) throws Exception {
-		//TODO
+		
+		if(identChain.getTypeName().isType(TypeName.URL)){
+			mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/net/URL;");
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromURL", 
+					"(Ljava/net/URL;)Ljava/awt/image/BufferedImage;", false);
+			
+			//TODO pop for now so it will run
+			mv.visitInsn(POP);
+			
+		}else if (identChain.getTypeName().isType(TypeName.FILE)){
+			mv.visitFieldInsn(GETSTATIC, className, identChain.getFirstToken().getText(), "Ljava/io/File;");
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "readFromFile", "(Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
+			
+			//TODO pop for now so it will run
+			mv.visitInsn(POP);
+		}else{
+			//TODO
+		}
+		
 		return null;
 	}
 
