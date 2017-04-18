@@ -249,6 +249,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			else if (binaryExpression.getOp().isKind(DIV))
 				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "div", 
 						"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
+			else if (binaryExpression.getOp().isKind(MOD))
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "mod", 
+						"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
 		}else{
 			//do operation and leave on stack
 			if(binaryExpression.getOp().isKind(PLUS))
