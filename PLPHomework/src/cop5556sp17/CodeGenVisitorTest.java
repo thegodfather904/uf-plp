@@ -28,7 +28,8 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String constantExpression = "tp url u1, url u2{image i1 image i2  u1 -> i1; u1 -> i2; image i3 i3 <-i2 % 2; frame fr i3 -> fr -> show;}";
+		String imageCopy = "tp url u1, url u2{image i1 image i2  u1 -> i1; u2 -> i2; i1 <- i2;}";
+//		String imageManipulation = "tp url u1, url u2{image i1 image i2  u1 -> i1; u1 -> i2; image i3 i3 <-i2 % 2; frame fr i3 -> fr -> show;}";
 //		String constantExpression = "tp url u, file fn{frame fr image i integer w u -> i -> fr -> screenwidth;}";
 //		String imageOpChain = "tp url u, file fn{frame fr image i integer w u -> i -> height -> w; integer test test <- w;}";
 //		String filterOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> convolve -> fr -> show;}";
@@ -38,7 +39,7 @@ public class CodeGenVisitorTest {
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
-		Scanner scanner = new Scanner(constantExpression);
+		Scanner scanner = new Scanner(imageCopy);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		ASTNode program = parser.parse();
