@@ -321,7 +321,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitConstantExpression(ConstantExpression constantExpression, Object arg) {
-		//TODO
+		
+		if(constantExpression.getFirstToken().isKind(KW_SCREENWIDTH))
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFrame", "getScreenWidth", "()I", false);
+		else if(constantExpression.getFirstToken().isKind(KW_SCREENHEIGHT))
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeFrame", "getScreenHeight", "()I", false);
+		
 		return null;
 	}
 

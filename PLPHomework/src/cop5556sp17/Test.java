@@ -14,10 +14,7 @@ public class Test {
 		test = imageIO.getURL(args, 1);
 		BufferedImage img = imageIO.readFromURL(test);
 		
-		img.getHeight();
-		
-		
-//		PLPRuntimeFrame.createOrSetFrame(img, null).showImage().moveFrame(1, 2).getYVal();
+		PLPRuntimeFrame.createOrSetFrame(img, null).getScreenHeight();
 		
 		
 	}
