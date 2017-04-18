@@ -13,7 +13,8 @@ public class Test {
 		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
 		test = imageIO.getURL(args, 1);
 		BufferedImage img = imageIO.readFromURL(test);
-		PLPRuntimeImageOps.scale(img, 2);
+		
+		img.getHeight();
 		
 		
 //		PLPRuntimeFrame.createOrSetFrame(img, null).showImage().moveFrame(1, 2).getYVal();

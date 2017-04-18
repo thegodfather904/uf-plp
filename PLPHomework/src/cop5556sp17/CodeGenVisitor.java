@@ -482,11 +482,10 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		if(imageOpChain.getFirstToken().isKind(KW_SCALE))
 			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "scale", 
 					"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
-		else if(imageOpChain.getFirstToken().isKind(OP_HEIGHT)){
-			//TODO
-		}else if(imageOpChain.getFirstToken().isKind(OP_WIDTH)){
-			//TODO
-		}
+		else if(imageOpChain.getFirstToken().isKind(OP_HEIGHT))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/awt/image/BufferedImage", "getHeight", "()I", false);
+		else if(imageOpChain.getFirstToken().isKind(OP_WIDTH))
+			mv.visitMethodInsn(INVOKEVIRTUAL, "java/awt/image/BufferedImage", "getWidth", "()I", false);
 		
 		return null;
 	}

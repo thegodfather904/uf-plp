@@ -28,7 +28,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String imageOpChain = "tp url u, file fn{frame fr image i u -> i -> scale(2) -> fr -> show;}";
+		String imageOpChain = "tp url u, file fn{frame fr image i integer w u -> i -> height -> w; integer test test <- w;}";
 //		String filterOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> convolve -> fr -> show;}";
 //		String integerChain = "tp url u, file fn{integer x integer y x <- 7;  x -> y; integer test test <- y;}";
 //		String frameOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> fr -> show -> move(1,2) -> yloc -> x;  integer y y <- x;}";
