@@ -217,23 +217,34 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitBinaryExpression(BinaryExpression binaryExpression, Object arg) throws Exception {
-      
-		//visit e0;
-		binaryExpression.getE0().visit(this, null);
-		
-		//visit e1;
-		binaryExpression.getE1().visit(this, null);
-		
+		if(binaryExpression.getE0().getTypeName().isType(TypeName.INTEGER) && 
+				binaryExpression.getE1().getTypeName().isType(TypeName.IMAGE)){
+			//visit e1;
+			binaryExpression.getE1().visit(this, null);
+			//visit e0;
+			binaryExpression.getE0().visit(this, null);
+		}else{
+			//visit e0;
+			binaryExpression.getE0().visit(this, null);
+			//visit e1;
+			binaryExpression.getE1().visit(this, null);
+		}
+
 		TypeName e0 = binaryExpression.getE0().getTypeName();
 		TypeName e1 = binaryExpression.getE1().getTypeName();
 		
 		//if two images, do the special image adding
-		if(e0.isType(IMAGE) && e1.isType(IMAGE)){
+		if(e0 != null && e0.isType(IMAGE) && e1 != null && e1.isType(IMAGE)){
 			if(binaryExpression.getOp().isKind(PLUS))
 				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "add", 
 						"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
 			else if(binaryExpression.getOp().isKind(MINUS))
-				mv.visitInsn(ISUB);
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "sub", 
+						"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+		}else if(binaryExpression.getE0().getTypeName().isType(TypeName.INTEGER) && binaryExpression.getE1().getTypeName().isType(TypeName.IMAGE) || 
+				binaryExpression.getE0().getTypeName().isType(TypeName.IMAGE) && binaryExpression.getE1().getTypeName().isType(TypeName.INTEGER)){
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "mul", 
+					"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
 		}else{
 			//do operation and leave on stack
 			if(binaryExpression.getOp().isKind(PLUS))
