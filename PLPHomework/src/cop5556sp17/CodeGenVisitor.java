@@ -224,53 +224,67 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//visit e1;
 		binaryExpression.getE1().visit(this, null);
 		
-		//do operation and leave on stack
-		if(binaryExpression.getOp().isKind(PLUS))
-			mv.visitInsn(IADD);
-		else if(binaryExpression.getOp().isKind(MINUS))
-			mv.visitInsn(ISUB);
-		else if(binaryExpression.getOp().isKind(OR))
-			mv.visitInsn(IOR);
-		else if (binaryExpression.getOp().isKind(TIMES))
-			mv.visitInsn(IMUL);
-		else if (binaryExpression.getOp().isKind(DIV))
-			mv.visitInsn(IDIV);
-		else if(binaryExpression.getOp().isKind(AND))
-			mv.visitInsn(IAND);
-		else if(binaryExpression.getOp().isKind(MOD))
-			mv.visitInsn(IREM);
-		else{
-			
-			Label trueLabel = new Label();
-			Label falseLabel = new Label();
-			Label doneLabel = new Label();
-			
-			if(binaryExpression.getOp().isKind(LT))
-				mv.visitJumpInsn(IF_ICMPGE, falseLabel);
-			else if(binaryExpression.getOp().isKind(LE))
-				mv.visitJumpInsn(IF_ICMPGT, falseLabel);
-			else if (binaryExpression.getOp().isKind(GT))
-				mv.visitJumpInsn(IF_ICMPLE, falseLabel);
-			else if (binaryExpression.getOp().isKind(GE))
-				mv.visitJumpInsn(IF_ICMPLT, falseLabel);
-			else if(binaryExpression.getOp().isKind(EQUAL))
-				mv.visitJumpInsn(IF_ICMPNE, falseLabel);
-			else if(binaryExpression.getOp().isKind(NOTEQUAL))
-				mv.visitJumpInsn(IF_ICMPEQ, falseLabel);
-			
-			//if true
-			mv.visitLabel(trueLabel);
-			mv.visitInsn(ICONST_1);
-			mv.visitJumpInsn(GOTO, doneLabel);
-			
-			//if false
-			mv.visitLabel(falseLabel);
-			mv.visitInsn(ICONST_0);
-			
-			//done label
-			mv.visitLabel(doneLabel);
-			
+		TypeName e0 = binaryExpression.getE0().getTypeName();
+		TypeName e1 = binaryExpression.getE1().getTypeName();
+		
+		//if two images, do the special image adding
+		if(e0.isType(IMAGE) && e1.isType(IMAGE)){
+			if(binaryExpression.getOp().isKind(PLUS))
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "add", 
+						"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+			else if(binaryExpression.getOp().isKind(MINUS))
+				mv.visitInsn(ISUB);
+		}else{
+			//do operation and leave on stack
+			if(binaryExpression.getOp().isKind(PLUS))
+				mv.visitInsn(IADD);
+			else if(binaryExpression.getOp().isKind(MINUS))
+				mv.visitInsn(ISUB);
+			else if(binaryExpression.getOp().isKind(OR))
+				mv.visitInsn(IOR);
+			else if (binaryExpression.getOp().isKind(TIMES))
+				mv.visitInsn(IMUL);
+			else if (binaryExpression.getOp().isKind(DIV))
+				mv.visitInsn(IDIV);
+			else if(binaryExpression.getOp().isKind(AND))
+				mv.visitInsn(IAND);
+			else if(binaryExpression.getOp().isKind(MOD))
+				mv.visitInsn(IREM);
+			else{
+				
+				Label trueLabel = new Label();
+				Label falseLabel = new Label();
+				Label doneLabel = new Label();
+				
+				if(binaryExpression.getOp().isKind(LT))
+					mv.visitJumpInsn(IF_ICMPGE, falseLabel);
+				else if(binaryExpression.getOp().isKind(LE))
+					mv.visitJumpInsn(IF_ICMPGT, falseLabel);
+				else if (binaryExpression.getOp().isKind(GT))
+					mv.visitJumpInsn(IF_ICMPLE, falseLabel);
+				else if (binaryExpression.getOp().isKind(GE))
+					mv.visitJumpInsn(IF_ICMPLT, falseLabel);
+				else if(binaryExpression.getOp().isKind(EQUAL))
+					mv.visitJumpInsn(IF_ICMPNE, falseLabel);
+				else if(binaryExpression.getOp().isKind(NOTEQUAL))
+					mv.visitJumpInsn(IF_ICMPEQ, falseLabel);
+				
+				//if true
+				mv.visitLabel(trueLabel);
+				mv.visitInsn(ICONST_1);
+				mv.visitJumpInsn(GOTO, doneLabel);
+				
+				//if false
+				mv.visitLabel(falseLabel);
+				mv.visitInsn(ICONST_0);
+				
+				//done label
+				mv.visitLabel(doneLabel);
+				
+			}
 		}
+		
+		
 		
 		return null;
 	}
@@ -397,10 +411,8 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 			}else{
 				if(identChain.getDec().getType().isKind(KW_INTEGER) || identChain.getDec().getType().isKind(KW_BOOLEAN))
 					mv.visitVarInsn(ILOAD, identChain.getDec().getSlotNumber());
-				else{
+				else
 					mv.visitVarInsn(ALOAD, identChain.getDec().getSlotNumber());
-					throw new Exception(); //TODO can it be another type?
-				}
 			}
 		}else{
 			if(identChain.getDec().getType().isKind(KW_INTEGER)){
@@ -437,8 +449,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		if(identExpression.getDec().getSlotNumber() == -1)
 			mv.visitFieldInsn(GETSTATIC, className, identExpression.getDec().getIdent().getText(), 
 					identExpression.getDec().getTypeName().getJVMTypeDesc());
-		else
-			mv.visitVarInsn(ILOAD, identExpression.getDec().getSlotNumber());
+		else{
+			if(identExpression.getDec().getType().isKind(Kind.KW_INTEGER) || identExpression.getDec().getType().isKind(Kind.KW_BOOLEAN))
+				mv.visitVarInsn(ILOAD, identExpression.getDec().getSlotNumber());
+			else
+				mv.visitVarInsn(ALOAD, identExpression.getDec().getSlotNumber());
+		}
+			
 		
 		return null;
 	}
@@ -449,8 +466,13 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//if sn == -1, its a field of the class, if any other sn its a local var
 		if(identX.getDec().getSlotNumber() == -1){
 			mv.visitFieldInsn(PUTSTATIC, className, identX.getText(), identX.getDec().getTypeName().getJVMTypeDesc());
-		}else
-			mv.visitVarInsn(ISTORE, identX.getDec().getSlotNumber());
+		}else{
+			if(identX.getDec().getType().isKind(Kind.KW_INTEGER) || identX.getDec().getType().isKind(Kind.KW_BOOLEAN))
+				mv.visitVarInsn(ISTORE, identX.getDec().getSlotNumber());
+			else
+				mv.visitVarInsn(ASTORE, identX.getDec().getSlotNumber());
+		}
+			
 		
 		return null;
 

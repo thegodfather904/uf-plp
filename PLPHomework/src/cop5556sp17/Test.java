@@ -7,14 +7,20 @@ import java.net.URL;
 public class Test {
 	
 	static URL test;
-	static File fn;
+	static URL test2;
 	
 	public Test(String[] args) throws Exception{
 		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
 		test = imageIO.getURL(args, 1);
 		BufferedImage img = imageIO.readFromURL(test);
+		BufferedImage img2 = imageIO.readFromURL(test2);
 		
-		PLPRuntimeFrame.createOrSetFrame(img, null).getScreenHeight();
+		PLPRuntimeImageOps.add(img, img2);
+		
+		img = img2;
+		
+		
+//		PLPRuntimeFrame.createOrSetFrame(img, null).getScreenHeight();
 		
 		
 	}

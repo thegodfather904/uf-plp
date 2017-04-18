@@ -28,7 +28,8 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String constantExpression = "tp url u, file fn{frame fr image i integer w u -> i -> fr -> screenwidth;}";
+		String constantExpression = "tp url u1, url u2{image i1 image i2  u1 -> i1; u2 -> i2; image i3 i3 <- i1 + i2; frame fr i3 -> fr -> show;}";
+//		String constantExpression = "tp url u, file fn{frame fr image i integer w u -> i -> fr -> screenwidth;}";
 //		String imageOpChain = "tp url u, file fn{frame fr image i integer w u -> i -> height -> w; integer test test <- w;}";
 //		String filterOpChain = "tp url u, file fn{frame fr image i integer x u -> i -> convolve -> fr -> show;}";
 //		String integerChain = "tp url u, file fn{integer x integer y x <- 7;  x -> y; integer test test <- y;}";
@@ -60,8 +61,10 @@ public class CodeGenVisitorTest {
 		System.out.println("wrote classfile to " + classFileName);
 		
 		// directly execute bytecode
+//		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
+//				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/large.png"} ;
 		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
-				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/large.png"} ;
+			"http://www.stickpng.com/assets/thumbs/580b57fbd9996e24bc43bc7c.png"} ;
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
 		System.out.println("END!");
