@@ -243,8 +243,12 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 						"(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
 		}else if(binaryExpression.getE0().getTypeName().isType(TypeName.INTEGER) && binaryExpression.getE1().getTypeName().isType(TypeName.IMAGE) || 
 				binaryExpression.getE0().getTypeName().isType(TypeName.IMAGE) && binaryExpression.getE1().getTypeName().isType(TypeName.INTEGER)){
-			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "mul", 
+			if (binaryExpression.getOp().isKind(TIMES))
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "mul", 
 					"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
+			else if (binaryExpression.getOp().isKind(DIV))
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "div", 
+						"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
 		}else{
 			//do operation and leave on stack
 			if(binaryExpression.getOp().isKind(PLUS))

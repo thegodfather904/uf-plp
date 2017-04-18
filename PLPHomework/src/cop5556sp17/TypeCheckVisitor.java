@@ -158,6 +158,8 @@ public class TypeCheckVisitor implements ASTVisitor {
 					(e0Type.isType(TypeName.INTEGER) && e1Type.isType(TypeName.IMAGE))){
 				switch(op.kind){
 				case TIMES:
+				case DIV:
+				case MOD:
 					binaryExpression.setTypeName(TypeName.IMAGE);
 					break;
 				}

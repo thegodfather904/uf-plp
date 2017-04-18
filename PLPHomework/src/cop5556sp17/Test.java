@@ -15,7 +15,7 @@ public class Test {
 		BufferedImage img = imageIO.readFromURL(test);
 		BufferedImage img2 = imageIO.readFromURL(test2);
 		
-		PLPRuntimeImageOps.mul(img, 2);
+		PLPRuntimeImageOps.div(img, 2);
 		
 		img = img2;
 		
