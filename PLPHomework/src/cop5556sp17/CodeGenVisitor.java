@@ -475,7 +475,19 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 
 	@Override
 	public Object visitImageOpChain(ImageOpChain imageOpChain, Object arg) throws Exception {
-		//TODO
+		
+		//visit tuple
+		imageOpChain.getArg().visit(this, null);
+		
+		if(imageOpChain.getFirstToken().isKind(KW_SCALE))
+			mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "scale", 
+					"(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;", false);
+		else if(imageOpChain.getFirstToken().isKind(OP_HEIGHT)){
+			//TODO
+		}else if(imageOpChain.getFirstToken().isKind(OP_WIDTH)){
+			//TODO
+		}
+		
 		return null;
 	}
 
