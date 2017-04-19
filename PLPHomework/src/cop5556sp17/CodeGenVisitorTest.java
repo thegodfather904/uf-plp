@@ -72,6 +72,23 @@ public class CodeGenVisitorTest {
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
 		System.out.println("END!");
+		
+		
+		
+//		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
+//		test = imageIO.getURL(args, 1);
+//		BufferedImage img = imageIO.readFromURL(test);
+//		BufferedImage img2 = imageIO.readFromURL(test2);
+//		
+//		PLPRuntimeImageIO.write(img, f);
+//		
+//		PLPRuntimeImageOps.copyImage(img);
+//		
+//		
+//		
+//		img = img2;
+//		PLPRuntimeFrame.createOrSetFrame(img, null).getScreenHeight();
+		
 	}
 
 	@Test
