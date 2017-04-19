@@ -188,9 +188,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//visit expression, prob need to evaluate and then leave on top of stack
 		assignStatement.getE().visit(this, arg);
 		
-//		//print whats on top of stack for grading TODO
-//		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
-//		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
+//		//print whats on top of stack for grading
+		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
+		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
 		
 		//visit var, prob need to consume whats on the top of the stack
 		assignStatement.getVar().visit(this, arg);

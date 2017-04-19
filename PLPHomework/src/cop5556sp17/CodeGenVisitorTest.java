@@ -71,9 +71,6 @@ public class CodeGenVisitorTest {
 				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/out.jpg"};
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
-		System.out.println("END!");
-		
-		
 		
 //		PLPRuntimeImageIO imageIO = new PLPRuntimeImageIO();
 //		test = imageIO.getURL(args, 1);
