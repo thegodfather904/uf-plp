@@ -28,7 +28,7 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String writeToFile = "assignImage url u {image i image j frame f u -> i; j <- i;j -> f -> show; }";
+		String writeToFile = "subImage url u {image i image j image k frame f \nu -> i; \nu -> j; \n k <- i-j; k -> f -> show;\n}";
 //		String imageCopy = "tp url u1, url u2{image i1 image i2  u1 -> i1; u2 -> i2; i1 <- i2;}";
 //		String imageManipulation = "tp url u1, url u2{image i1 image i2  u1 -> i1; u1 -> i2; image i3 i3 <-i2 % 2; frame fr i3 -> fr -> show;}";
 //		String constantExpression = "tp url u, file fn{frame fr image i integer w u -> i -> fr -> screenwidth;}";

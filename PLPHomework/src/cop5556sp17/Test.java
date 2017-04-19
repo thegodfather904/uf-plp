@@ -19,7 +19,7 @@ public class Test {
 		
 		PLPRuntimeImageIO.write(img, f);
 		
-		PLPRuntimeImageOps.mod(img, 2);
+		PLPRuntimeImageOps.copyImage(img);
 		
 		
 		

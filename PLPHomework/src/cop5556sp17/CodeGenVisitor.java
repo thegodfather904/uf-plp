@@ -188,9 +188,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		//visit expression, prob need to evaluate and then leave on top of stack
 		assignStatement.getE().visit(this, arg);
 		
-		//print whats on top of stack for grading
-		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
-		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
+//		//print whats on top of stack for grading TODO
+//		CodeGenUtils.genPrint(DEVEL, mv, "\nassignment: " + assignStatement.var.getText() + "=");
+//		CodeGenUtils.genPrintTOS(GRADE, mv, assignStatement.getE().getTypeName());
 		
 		//visit var, prob need to consume whats on the top of the stack
 		assignStatement.getVar().visit(this, arg);
@@ -489,6 +489,11 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 		}else{
 			if(identX.getDec().getType().isKind(Kind.KW_INTEGER) || identX.getDec().getType().isKind(Kind.KW_BOOLEAN))
 				mv.visitVarInsn(ISTORE, identX.getDec().getSlotNumber());
+			else if (identX.getDec().getType().isKind(KW_IMAGE)){
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageOps", "copyImage", 
+						"(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;", false);
+				mv.visitVarInsn(ASTORE, identX.getDec().getSlotNumber());
+			}
 			else
 				mv.visitVarInsn(ASTORE, identX.getDec().getSlotNumber());
 		}
