@@ -440,7 +440,9 @@ public class CodeGenVisitor implements ASTVisitor, Opcodes {
 				mv.visitInsn(DUP);
 				mv.visitVarInsn(ASTORE, identChain.getDec().getSlotNumber());
 			}else if (identChain.getDec().getType().isKind(KW_FILE)){
-				//TODO
+				mv.visitFieldInsn(GETSTATIC, className, identChain.getDec().getIdent().getText(), "Ljava/io/File;");
+				mv.visitMethodInsn(INVOKESTATIC, "cop5556sp17/PLPRuntimeImageIO", "write", 
+						"(Ljava/awt/image/BufferedImage;Ljava/io/File;)Ljava/awt/image/BufferedImage;", false);
 			}else if (identChain.getDec().getType().isKind(KW_FRAME)){
 				//image is already on top of stack, load null as second param
 				mv.visitInsn(ACONST_NULL);

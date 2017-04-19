@@ -28,7 +28,8 @@ public class CodeGenVisitorTest {
 	
 	@Test
 	public void myTests() throws Exception {
-		String imageCopy = "tp url u1, url u2{image i1 image i2  u1 -> i1; u2 -> i2; i1 <- i2;}";
+		String writeToFile = "assignImage url u {image i image j frame f u -> i; j <- i;j -> f -> show; }";
+//		String imageCopy = "tp url u1, url u2{image i1 image i2  u1 -> i1; u2 -> i2; i1 <- i2;}";
 //		String imageManipulation = "tp url u1, url u2{image i1 image i2  u1 -> i1; u1 -> i2; image i3 i3 <-i2 % 2; frame fr i3 -> fr -> show;}";
 //		String constantExpression = "tp url u, file fn{frame fr image i integer w u -> i -> fr -> screenwidth;}";
 //		String imageOpChain = "tp url u, file fn{frame fr image i integer w u -> i -> height -> w; integer test test <- w;}";
@@ -39,7 +40,7 @@ public class CodeGenVisitorTest {
 //		String scoping = "emptyProg integer x{integer x x <- 10; integer y y <- 11; integer z z <- 12; if(x == 10){ integer x x <- 999; if(y==11){z <-x;} } y <- x;}";
 //		String input = "emptyProg integer x{integer y integer count count <- 0; while(count < 10){y <- count + 1; count <- count + 1;} y <- 2;}";	
 //		String simpleTest = "emptyProg integer x{integer y y <- 12;}";	
-		Scanner scanner = new Scanner(imageCopy);
+		Scanner scanner = new Scanner(writeToFile);
 		scanner.scan();
 		Parser parser = new Parser(scanner);
 		ASTNode program = parser.parse();
@@ -64,8 +65,10 @@ public class CodeGenVisitorTest {
 		// directly execute bytecode
 //		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
 //				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/large.png"} ;
-		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
-			"http://www.stickpng.com/assets/thumbs/580b57fbd9996e24bc43bc7c.png"} ;
+//		String[] args = new String[] {"http://prod.static.jaguars.clubs.nfl.com/nfl-assets/img/gbl-ico-team/JAX/logos/home/large.png", 
+//			"http://www.stickpng.com/assets/thumbs/580b57fbd9996e24bc43bc7c.png"} ;
+		String [] args = new String[]{"https://www.ancestry.com/wiki/images/archive/a/a9/20100708215937%21Example.jpg",
+				"/home/tony/Desktop_Folder/UF/PLP/uf-plp/out.jpg"};
 		Runnable instance = CodeGenUtils.getInstance(name, bytecode, args);
 		instance.run();
 		System.out.println("END!");
